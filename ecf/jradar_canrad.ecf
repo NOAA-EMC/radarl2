@@ -1,0 +1,63 @@
+#PBS -N radar_canrad_%TIME%
+#PBS -j oe
+#PBS -S /bin/bash
+#PBS -q %QUEUE%
+#PBS -l select=1:ncpus=4:mem=10000MB 
+##BSUB -n 8
+#PBS -A %PROJ%-%PROJENVIR%
+##BSUB -x
+##BSUB -R span[ptile=4]; -R affinity[core]
+#PBS -l walltime=01:00:00
+#PBS -l debug=true
+
+#export TIME_FLAG=YES
+
+model=radarl2
+%include <head.h>
+%include <envir-p1.h>
+
+# CALL executable job script here
+VERSION_FILE=$NWROOT/versions/radar_canrad.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  ecflow_client --msg="***JOB ${ECFNAME} ERROR: Version File $VERSION_FILE does not exist ***"
+  ecflow_client --abort
+  exit
+fi
+
+#############################################################
+## Load modules
+##############################################################
+module load ips/$ips_ver
+module load impi/$impi_ver
+module load CFP/$cfp_ver
+module list
+
+# EXPORT list here
+export job=`date -u +radar_canrad_%%H%%M`
+export envir=%ENVIR%
+runcyc=`date -u +%%H`
+export cyc=$runcyc
+
+$NWROOT/decoders/decod_dccrad_${decod_dccrad_ver}/jobs/JRADAR_CANRAD
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="*** ${ECF_NAME}: ERROR RUNNING $JJOB ***"
+  ecflow_client --abort
+  exit
+fi
+
+%include <tail.h>
+%manual
+######################################################################
+# Purpose: To process the Canadian radar level 2 data
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end

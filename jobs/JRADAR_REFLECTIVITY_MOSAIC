@@ -1,0 +1,278 @@
+#!/bin/sh
+
+#======================================================================
+# start job script
+#======================================================================
+set -xa
+date -u
+
+
+# #### 10/15/07 ##########################################
+# SETUP 3-D RADAR REFLECTIVITY MOSAIC PROCESSING VARIABLES
+# ########################################################
+export PS4='MAIN:$SECONDS + '
+
+###########################################################
+# obtain unique process id (pid) and make temp directories
+###########################################################
+export pid=$$
+#export job=radar_reflectivity_mosaic
+#if [ $envir = prod ]
+#then
+#    DATAROOT=/tmpnwprd1
+#else
+#    DATAROOT=/tmpnwprd2
+#fi
+#export DATA=${DATA:-$DATAROOT/${job}.${pid}}
+export DATA=$DATAROOT/${job}.${pid}
+export jlogfile=$DATA/jlogfile
+mkdir -p $DATA
+cd $DATA 
+
+echo `date`
+export cycle=t${cyc}z
+
+####################################
+# Specify NET and RUN Name and model
+####################################
+export NET=radarl2   # 15 min now
+#export radar=hourly   # 15 min now
+export RUN=radar
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+####################################
+# Specify Execution Areas
+####################################
+# JY export HOMEradarl2=${HOMEradarl2:-${NWROOT}/radar.${radar_ver}}
+export SCRIPTradar=$HOMEradarl2/scripts
+export EXECradar=$HOMEradarl2/exec
+export PARMradar=$HOMEradarl2/parm
+# JY export hisdir=${hisdir:-${DCOMROOT}/nexrad_level2}
+export hisdir=${hisdir:-${DCOMROOT}/../../${envir}/dcom/nexrad_level2}
+
+####################################
+# set mosaic dump history file 
+####################################
+# JY currenttime=`$NDATE ``date +%M`
+currenttime=${PDY}${cyc}`date +%M`
+
+echo 'current time:' $currenttime
+currenthour=`echo $currenttime | cut -c9-10`
+currentmin=`echo $currenttime | cut -c11-12`
+echo 'current time:' $currenttime
+currenthour=`echo $currenttime | cut -c9-10`
+currentmin=`echo $currenttime | cut -c11-12`
+
+echo "current minute  " $currenthour
+echo "current hour  " $hourhh
+## 20 min time window
+    if [ $currentmin -lt '10' ];then
+       if [ $currenthour -eq '00' ];then
+          currenttime=`expr $currenttime - 40 - 7600`
+       else
+         currenttime=`expr $currenttime - 40`
+       fi
+    else
+       currenttime=$currenttime
+    fi
+currenttime=`expr $currenttime - 10`
+echo "10 min ago updated time  " $currenttime
+
+cp $hisdir/radar_mosaic.history .
+err1=$?
+if [ $err1 -eq 0 ]; then
+echo radar ref mosaic history is available
+hisdate=`tail -1 radar_mosaic.history | cut -c1-12`
+else
+echo no radar ref mosaic history, will create a history file 
+hisdate=`echo $currenttime |cut -c1-10`00
+fi
+
+echo 'data processed in last run:' $hisdate
+
+thisdate=`echo $hisdate | cut -c1-10`
+thismin=`echo $hisdate | cut -c11-12`
+newmin=`expr $thismin + 15`
+if [ $newmin -eq 60 ]; then
+  thisdate=`$NDATE +1 $thisdate`
+  newmin='00'
+fi
+
+mydate=$thisdate
+
+#new data to process
+mkdir -p $hisdir
+
+hisdate=$thisdate$newmin
+
+mymin=$hisdate
+tmp=','
+inum=0
+while [ $hisdate -lt $currenttime -a $inum -lt 4 -a $newmin -lt 60 ]
+do
+ inum=`expr $inum + 1`
+ echo $hisdate, 'runs', $inum
+ echo $hisdate >> $hisdir/radar_mosaic.history
+ thisdate=`echo $hisdate | cut -c1-10`
+ thismin=`echo $hisdate | cut -c11-12`
+ newmin=`expr $thismin + 15`
+ if [ $newmin -lt 60 ]; then
+ hisdate=$thisdate$newmin
+ mymin=`echo ${mymin}${tmp}${hisdate}`
+ echo $inum: $mymin
+ echo 
+ fi
+done
+
+
+
+if [ $inum -eq 0 ]; then
+ echo no data to process 
+ exit
+fi
+
+# CCM don't forget second setting of REFprod at the end of this script!!
+# JY export COMOUT_REFprod=${COMOUT_REFprod:-${COMROOT}/${NET}/${RUN}.$mydate}
+# export COMIN_SRCtank=${COMIN_SRCtank:-${COMROOT}/${NET}/SRCtank}
+export COMOUT_REFprod=${COMOUT_REFprod:-$(compath.py -o ${NET}/${radarl2_ver}/${RUN}.$mydate)}
+export COMIN_SRCtank=${COMIN_SRCtank:-$(compath.py ${envir}/${NET}/${radarl2_ver}/SRCtank)}
+
+##############################
+# Set up the UTILITIES
+##############################
+#export utilscript=/nwprod/util/ush
+
+##############################
+# Run setup to initialize working directory and utility scripts
+##############################
+#sh $utilscript/setup.sh
+
+##############################
+# Run setpdy and initialize PDY variables
+##############################
+setpdy.sh
+. ./PDY
+
+export nproc=8
+
+mkdir -p $COMOUT_REFprod
+tiles='tile1 tile2 tile3 tile4 tile5 tile6 tile7 tile8'
+for itile in $tiles
+do
+	mkdir -p ${COMOUT_REFprod}/$itile
+done
+
+
+
+cp $SCRIPTradar/exradar_reflectivity_mosaic.pl $DATA
+cat exradar_reflectivity_mosaic.pl        | \
+    sed s:mymin:${mymin}:                           > run.pl
+
+chmod 755 run.pl
+
+proc=1
+until [ $proc -gt $nproc ]
+do
+   cd $DATA
+   mkdir $DATA/TASK$proc
+   cp $EXECradar/radar_reflectivity_mosaic $DATA/TASK$proc/mosaic
+   cp $PARMradar/reflectivity_mosaic_tile${proc}.config $DATA/TASK$proc
+   cp $DATA/run.pl ./TASK$proc
+
+   cd TASK$proc
+   REFprodtile=${COMOUT_REFprod}/tile${proc}
+   cat reflectivity_mosaic_tile${proc}.config | \
+       sed s:COMIN_SRCtank:${COMIN_SRCtank}:               | \
+       sed s:REFprodtile:${REFprodtile}:         > config
+   cd $DATA
+
+cat << EOF > poescript$proc
+      cd TASK$proc
+      ./run.pl config tile$proc
+EOF
+proc=`expr $proc + 1 `
+done
+
+tail -2000 $hisdir/radar_mosaic.history > radar_mosaic.history_temp
+cp radar_mosaic.history_temp $hisdir/radar_mosaic.history
+
+#
+# Create master poescript
+#
+
+
+proc=1
+cat /dev/null > poescript
+until [ $proc -gt $nproc ]
+do
+    chmod 775 ./poescript$proc
+    if [ $proc -eq 1 ] ; then
+       echo "./poescript$proc" > poescript
+    else
+       echo "./poescript$proc" >> poescript
+    fi
+proc=`expr $proc + 1 `
+done
+
+chmod 775 poescript
+#export MP_PGMMODEL=mpmd
+export CMDFILE=poescript
+#export MP_CMDFILE=poescript
+
+#
+# Execute the script.
+
+msg="Begin poe"
+postmsg "$jlogfile" "$msg"
+pwd
+
+#mpirun -l cfp  $CMDFILE
+mpiexec -np $nproc --cpu-bind verbose,core cfp $CMDFILE
+
+echo "Ending Poe  : `date`"
+
+cd $DATA
+
+files=`find TASK* -name 'src*log' -exec ls -1 {} \; | sort`
+rm -f filecount
+for ifile in $files
+do
+        grep 'NO' $ifile >> filecount
+done
+
+noSRCtile=`wc filecount | awk '{ print $1 }'` 
+
+echo $noSRCtile
+
+if [ $noSRCtile -eq 8 ]
+then
+	echo "ERROR: no SRC files in COMIN_SRCtank, may be caused by level2 data delay"
+	export err=1
+else
+	export err=0
+fi	
+err_chk
+
+if [ $noSRCtile -gt 0 ]
+then
+	echo "WARNING: there are $noSRCtile mosaic tile(s) not generated on time, this may lead to ref2grb job failure"
+fi	
+cat $pgmout
+
+msg="ENDED NORMALLY."
+postmsg "$jlogfile" "$msg"
+
+ecflow_client --event release_mosaic
+sleep 60
+
+KEEPDATA=${KEEPDATA:-NO}
+if [ $KEEPDATA != "YES" ] ; then
+    cd $DATAROOT
+    rm -rf $DATA
+fi

@@ -1,0 +1,346 @@
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radar_level2---reflectivity_ref2grb release 1.0.0 --> released Oct 10, 2019
+
+Initial population of vertical structure.
+
+files:
+  M ./scripts/exradar_reflectivity_ref2grb.sh.ecf
+  A ./sorc/loadmod
+    ./sorc/build.sh
+    ./sorc/install.sh
+    ./sorc/clean.sh
+    ./sorc/setlibs.rc
+    ./sorc/radar_reflectivity_ref2grb.fd/radar_reflectivity_ref2grb_combintiles.f90
+  M ./sorc/radar_reflectivity_ref2grb.fd/radar_reflectivity_ref2grb.f90
+  M ./sorc/radar_reflectivity_ref2grb.fd/makefile
+  M ./jobs/JRADAR_REFLECTIVITY_REF2GRB
+
+( M - modified)
+
+ job script changes:
+    - transit to DELL and use NCO's new code standard.
+
+ EX script changes:
+    - use NCO's new code standard.
+
+ Source code changes:
+    - use mpiifort in makefile.
+    - read in time from a file in radar_reflectivity_ref2grb.f90
+      since intel mpi doesn't support read in parameter from stdin
+
+ Output changes:
+ ---------------
+    - No changes.
+
+
+ Compute Resource Information:
+ -----------------------------
+   - #BSUB -R span[ptile=4]
+   - #BSUB -n 8
+   - #BSUB -M 5000
+   module inforation:
+   . /usrx/local/prod/lmod/lmod/init/ksh
+   module purge
+   module load EnvVars/1.0.2
+   module load lsf/10.1
+   module load ips/18.0.1.163
+   module load impi/18.0.1
+   module load prod_util/1.1.0
+   module load prod_envir/1.0.2
+   module load gempak/7.3.1
+   module load grib_util/1.1.1
+   module list
+
+
+
+ Build Instructions:
+ -------------------
+   - update ${NWROOT}/versions/radar.ver
+   - compile the package:
+     1. cd  ${NWROOT}/radar.v1.0.0/sorc
+     2. loadmod_ref2grb
+     3. build_ref2grb.sh
+     4. cp ./radar_reflectivity_ref2grb/radar_reflectivity_ref2grb ${NWROOT}/radar.v1.0.0/exec
+
+ Preimplementation Testing Requirements:
+ ---------------------------------------
+   - Test production JRADAR_REFLECTIVITY_REF2GRB
+
+ Dissemination:
+ --------------
+   - The main users of this output are NAM networks.
+   - No change in dissemination.
+   - No change in archival on HPSS.
+
+ Special Instructions:
+ ---------------------
+   Please retrieve the radar_level2.ver file:
+   git clone gerrit:EMC_obsproc
+   cd EMC_obsproc; git checkout master
+   cp versions/20190912_OBSPROC-v11.6.0/radar_reflectivity_ref2grb.ver $NWROOT/versions
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radar_reflectivity_ref2grb release 1.2.0 --> released Nov 23, 2018
+
+Initial population of vertical structure.
+
+files:
+  M radar_reflectivity_ref2grb/scripts/exradar_reflectivity_ref2grb.sh.ecf
+    radar_reflectivity_ref2grb/sorc/build.sh
+    radar_reflectivity_ref2grb/sorc/install.sh
+    radar_reflectivity_ref2grb/sorc/clean.sh
+    radar_reflectivity_ref2grb/sorc/setlibs.rc
+    radar_reflectivity_ref2grb/sorc/radar_reflectivity_ref2grb.fd/radar_reflectivity_ref2grb_combintiles.f90
+    radar_reflectivity_ref2grb/sorc/radar_reflectivity_ref2grb.fd/radar_reflectivity_ref2grb.f90
+    radar_reflectivity_ref2grb/sorc/radar_reflectivity_ref2grb.fd/makefile
+    radar_reflectivity_ref2grb/jobs/JRADAR_REFLECTIVITY_REF2GRB
+
+( M - modified)
+
+ EX script changes:
+    - check if all 8 tiles of radar mosaic are available and decide if "mpirun.lsf 
+      ${EXECradar}/radar_reflectivity_ref2grb < tmp > test.log" will be submitted.
+    - give warning message if the number of total tiles is less than 8
+
+ Source code changes:
+    - No changes.
+
+ Output changes:
+ ---------------
+    - No changes.
+
+
+ Compute Resource Information:
+ -----------------------------
+   No change in requested resources in the job cards.
+   No changes to memory usage.
+   No change in disk space and run time.
+
+
+ Libraries:
+ ----------
+    - Source code radar_reflectivity_ref2grb:
+         link to version 2.0.1 of bacio library
+         link to version 2.2.0 of w3emc library (previously 2.0.5)
+         link to version 2.0.6 of w3nco library
+         link to version 2.5.0 of g2 library (new)
+         link to version 1.900.1 of jasper library (new)
+         link to version 1.2.44 of png library (new)
+         link to version 1.2.6 of z library (new)
+
+
+ Build Instructions:
+ -------------------
+   - See sorc/README.build
+
+
+ Preimplementation Testing Requirements:
+ ---------------------------------------
+   - Test production JRADAR_REFLECTIVITY_REF2GRB
+
+
+ Dissemination:
+ --------------
+   - The main users of this output are NAM networks.
+   - No change in dissemination.
+   - No change in archival on HPSS.
+
+
+ Special Instructions:
+ ---------------------
+   Please retrieve the radar_reflectivity_ref2grb.ver file:
+   git clone gerrit:EMC_obsproc
+   cd EMC_obsproc; git checkout master
+   cp versions/20180829_OBSPROC-v10.3.0/radar_reflectivity_ref2grb.ver /nwprod/versions
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radar_reflectivity_ref2grb release 1.1.0 --> released May 1, 2015
+                                         --> implemented Aug 10, 2015
+
+Initial population of vertical structure.
+
+files:
+  M radar_reflectivity_ref2grb/scripts/exradar_reflectivity_ref2grb.sh.ecf
+    radar_reflectivity_ref2grb/sorc/build.sh
+    radar_reflectivity_ref2grb/sorc/install.sh
+    radar_reflectivity_ref2grb/sorc/clean.sh
+  M radar_reflectivity_ref2grb/sorc/setlibs.rc
+    radar_reflectivity_ref2grb/sorc/radar_reflectivity_ref2grb.fd/radar_reflectivity_ref2grb_combintiles.f90
+  M radar_reflectivity_ref2grb/sorc/radar_reflectivity_ref2grb.fd/radar_reflectivity_ref2grb.f90
+  M radar_reflectivity_ref2grb/sorc/radar_reflectivity_ref2grb.fd/makefile
+    radar_reflectivity_ref2grb/jobs/JRADAR_REFLECTIVITY_REF2GRB
+
+( M - modified)
+
+ EX script changes:
+    - add minute parameter as read-in parameter.
+    - remove converting grib1 to grib2 and add converting grib2 to grib1
+
+ Source code changes:
+    - setlibs.rc are changed to include g2 (grib2), jasper, png and z libs
+    - makefile changed to use g2 (grib2), jasper, png and z libs
+    - install.sh and clean.sh are added to copy executable to "exec" directory
+      and clean up executable and object file in "sorc" directory
+    - radar_reflectivity_ref2grb.f90 are changed to dump grib2 format data
+    - radar_reflectivity_ref2grb.f90 are changed to dump hybrid scan
+      reflectivity and hybrid scan reflectivity height 
+
+
+ Output changes:
+ ---------------
+    - No changes.
+
+
+ Compute Resource Information:
+ -----------------------------
+   No change in requested resources in the job cards.
+   No changes to memory usage.
+   No change in disk space and run time.
+
+
+ Libraries:
+ ----------
+    - Source code radar_reflectivity_ref2grb:
+         link to version 2.0.1 of bacio library
+         link to version 2.2.0 of w3emc library (previously 2.0.5)
+         link to version 2.0.6 of w3nco library
+         link to version 2.5.0 of g2 library (new)
+         link to version 1.900.1 of jasper library (new)
+         link to version 1.2.44 of png library (new)
+         link to version 1.2.6 of z library (new)
+
+
+ Build Instructions:
+ -------------------
+   - See sorc/README.build
+
+
+ Preimplementation Testing Requirements:
+ ---------------------------------------
+   - Test production JRADAR_REFLECTIVITY_REF2GRB as part of the parallel-
+     production test of the HiRes FY15Q1 bundle.
+
+
+ Dissemination:
+ --------------
+   - The main users of this output are NAM networks.
+   - No change in dissemination.
+   - No change in archival on HPSS.
+
+
+ Special Instructions:
+ ---------------------
+   This is part of OBSPROC.v5.0.0.
+   For convenience, this is bundled with the following packages:
+      v2.6.0 of obsproc_satingest,
+      v3.2.1 of obsproc_dump,
+      v1.2.2 of obsproc_dump_monitor,
+      v2.0.1 of obsproc_dump_post,
+      v2.0.4 of obsprod_cdas,
+      v2.1.1 of obsprod_global,
+      v2.0.3 of obsproc_nam,
+      v3.5.0 of obsproc_prep,
+      v2.1.0 of obsproc_prep_post,
+      v2.0.3 of obsproc_rap,
+      v2.0.4 of obsproc_rtma,
+      v2.0.4 of obsproc_urma,
+      v1.2.0 of obsproc_shared/bufr_dumplist.
+   However, it can be implemented either simultaneously with, or at some time
+   other than, the above packages.
+
+   Please export file  
+   https://svnemc.ncep.noaa.gov/projects/obsproc/branches/VS/versions/RADAR/20150501_RADAR-fy15q2/radar_reflectivity_ref2grb.ver
+   and copy to /nwprod/versions.
+   (lowest sub-directory later renamed to 20150501_OBSPROC.v5.0.0)
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radar_reflectivity_ref2grb release 1.0.0 --> released Aug 28, 2014
+                                         --> implemented Nov 4, 2014
+
+Initial population of vertical structure.
+
+files:
+  M radar_reflectivity_ref2grb/scripts/exradar_reflectivity_ref2grb.sh.ecf
+  M radar_reflectivity_ref2grb/sorc/build.sh
+  M radar_reflectivity_ref2grb/sorc/install.sh
+  M radar_reflectivity_ref2grb/sorc/clean.sh
+  M radar_reflectivity_ref2grb/sorc/setlibs.rc
+  M radar_reflectivity_ref2grb/sorc/radar_reflectivity_ref2grb.fd/radar_reflectivity_ref2grb_combintiles.f90
+  M radar_reflectivity_ref2grb/sorc/radar_reflectivity_ref2grb.fd/radar_reflectivity_ref2grb.f90
+  M radar_reflectivity_ref2grb/sorc/radar_reflectivity_ref2grb.fd/makefile
+  M radar_reflectivity_ref2grb/jobs/JRADAR_REFLECTIVITY_REF2GRB
+
+( M - modified)
+
+
+ JOB script changes:
+   JRADAR_REFLECTIVITY_REF2GRB:
+    - Environment variable nwprodhome now defaults to new vertical structure
+      directory.
+    - Environment variable radar_reflectivity_ref2grb_ver is used to control
+      the version number.
+    - Environment variable SCRIPTSradar now defaults to scripts directory
+
+ EX script changes:
+    - Move to vertical structure.
+
+ Source code changes:
+    - build.sh and setlibs.rc are added to sorc directory to control the
+      version number of NCEP libs
+    - install.sh and clean.sh are added to copy executable to "exec" directory
+      and clean up executable and object file in "sorc" directory
+    - Move to vertical structure.
+
+
+ Output changes:
+ ---------------
+    - No changes.
+
+
+ Compute Resource Information:
+ -----------------------------
+   No change in requested resources in the job cards.
+   No changes to memory usage.
+   No change in disk space and run time.
+
+
+ Shared Software:
+ ----------------
+    - Source code radar_reflectivity_ref2grb:
+         link to version 2.0.1 of bacio library
+         link to version 2.2.0 of w3emc library
+         link to version 2.0.6 of w3nco library
+
+
+ Preimplementation Testing Requirements:
+ ---------------------------------------
+   - Test production JRADAR_REFLECTIVITY_REF2GRB as part of the parallel-
+     production test of the OBSPROC FY14Q4 bundle.
+
+
+ Dissemination:
+ --------------
+   - The main users of this output are NAM networks.
+   - No change in dissemination.
+   - No change in archival on HPSS.
+
+
+ Special Instructions:
+ ---------------------
+   This is part of OBSPROC.v4.0.0.
+   This must be implemented simultaneously with the implementations of:
+      v1.2.1 of obsproc_dump_monitor,
+      v2.0.2 of obsproc_global, obsproc_nam, obsproc_rap, obsproc_rtma,
+      v2.0.2 of obsproc_urma,
+      v2.3.0 of obsproc_satingest,
+      v3.2.0 of obsproc_dump, obsproc_prep,
+      v2.0.1 of obsproc_prep_post,
+      v1.0.0 of obsproc_dump_alert, radar_reflectivity_mosaic,
+      v1.0.1 of obsproc_shared/bufr_avgdata.
+
+   Please export file
+   https://svnemc.ncep.noaa.gov/projects/obsproc/branches/VS/versions/RADAR/20140828_RADAR-fy14q4/radar_reflectivity_ref2grb.ver
+   and copy to /nwprod/versions.
+   (lowest sub-directory later renamed to 20140828_OBSPROC.v4.0.0)
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

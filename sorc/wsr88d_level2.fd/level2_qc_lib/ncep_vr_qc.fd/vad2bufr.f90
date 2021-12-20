@@ -1,0 +1,112 @@
+ subroutine vad2_bufr_out(lunout, lundx, station_id, station_lat, station_lon, &
+                          station_height, obs_yyyy, obs_mm, obs_dd, obs_hh, &
+                          obs_mn, height, uwind, vwind, qc_flag, num_records)
+ implicit none
+
+ integer, parameter :: MAX_LEVELS=255 !maximum records for a station
+ character(len=80) :: output_bufr_file
+ character(len=8) :: mnemonic_name='NC002017'
+ character(len=8) :: station_id 
+ character(len=200) :: command_line
+ integer :: lunout, lundx
+ integer :: num_records !number of data records for a single station
+
+ real(8) :: station_lat, station_lon, station_height  
+ integer :: obs_yyyy, obs_mm, obs_dd, obs_hh, obs_mn, idate, ios 
+ real(8), dimension(MAX_LEVELS):: height, uwind, vwind
+ integer, dimension(MAX_LEVELS):: qc_flag
+
+ real(8), dimension(4, MAX_LEVELS)::real_arr
+ real(8), dimension(MAX_LEVELS)::real_arr2 !1-D array for scalar variables 
+
+ character(len=8) cval !8-character string to store the station id
+ real(8) :: rval !store the station id in real format
+ integer :: i, iret, nlvls !number of levels of the data reports array
+
+ equivalence (cval, rval)
+
+!open(500,file='testvad') 
+!write(500,*)station_id,station_lat,station_lon,station_height
+!write(500,*)obs_yyyy,obs_mm,obs_dd,obs_hh,obs_mn
+!close(500)
+
+
+ call datelen(10) !Store a 10-digit idate in section 1 of 
+                  !each output BUFR message
+
+ !create the output bufr message file  NOT NEEDED?
+ !open (unit=lunout, file=output_bufr_file, status="new", iostat=ios)
+
+ !open the BUFR tables file
+  open(lundx, file="bufrtab.002", status="old", iostat=ios)
+
+ call openbf(lunout, "OUT", lundx)!open BUFR file in unit 51
+                           !for output use external BUFR table in unit 31 to
+                           !define structure of BUFR reports
+
+
+ !add base value of the station_height to the height
+ height=height*1000.0+station_height
+
+ !Insert the station report to the BUFR message
+ idate=(obs_yyyy*1000000 + obs_mm*10000 + &
+        obs_dd*100 + obs_hh)
+
+ !open a vad2 BUFR message to store new data report
+ call openmb(lunout, mnemonic_name, idate)      
+
+ !store the YYYYMMDD to array2
+ real_arr2(1)=obs_yyyy
+ real_arr2(2)=obs_mm
+ real_arr2(3)=obs_dd
+
+ !store the YYYYMMDD to the BUFR message
+ !call ufbseq(lunout, real_arr2, MAX_MNEMONICS, 1, iret, "YYMMDD")
+ ! call ufbseq(lunout, real_arr2, 3, 1, iret, "YYMMDD")
+ call ufbint(lunout, real_arr2, 3, 1, iret, "YEAR MNTH DAYS")
+
+ !store the HHMM to the array2
+ real_arr2(1)=obs_hh
+ real_arr2(2)=obs_mn
+ 
+ !store the HHMM to the BUFR message
+!call ufbseq(lunout, real_arr2, 2, 1, iret, "HHMM")
+ call ufbint(lunout, real_arr2, 2, 1, iret, "HOUR MINU")
+
+ !store station_id, corn, station_lat, station_lon, height 
+ !to array2 for mnemonics "NXRID"
+ cval=station_id
+
+ real_arr2(1)=rval
+ real_arr2(2)=0
+ real_arr2(3)=station_lat
+ real_arr2(4)=station_lon
+ real_arr2(5)=station_height
+
+ !store the NXRID to the BUFR message
+ !call ufbseq(lunout, real_arr2, 5, 1, iret, "NXRID")
+ call ufbint(lunout, real_arr2, 5, 1, iret, "RPID CORN CLAT CLON SELV")
+
+ !store the height, uwind, vwind, qc_flag to the 2-D array
+ do i=1, num_records
+   real_arr(1,i)=height(i)
+   real_arr(2,i)=uwind(i)
+   real_arr(3,i)=vwind(i)
+   real_arr(4,i)=real(qc_flag(i))
+ end do
+
+ nlvls=num_records
+! print *, "nlvls now is: ", nlvls
+ 
+ !store the data array to the BUFR message
+ call UFBINT(lunout, real_arr, 4, nlvls, iret, 'HEIT UWND VWND QFV2')
+
+ call writsb(lunout)
+ call closbf(lunout)
+
+!command_line="mv fort.51 " // output_bufr_file
+!call compact(command_line)
+!print *, "command_line now is: ", command_line
+!call system (command_line)
+
+end subroutine vad2_bufr_out

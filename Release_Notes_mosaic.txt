@@ -1,0 +1,428 @@
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radar_level2---reflectivity mosaic release 1.0.0 - Oct 10, 2019
+
+Initial population of vertical structure.
+
+files:
+    ./parm/reflectivity_mosaic_tile1.config
+    ./parm/reflectivity_mosaic_tile2.config
+    ./parm/reflectivity_mosaic_tile3.config
+    ./parm/reflectivity_mosaic_tile4.config
+    ./parm/reflectivity_mosaic_tile5.config
+    ./parm/reflectivity_mosaic_tile6.config
+    ./parm/reflectivity_mosaic_tile7.config
+    ./parm/reflectivity_mosaic_tile8.config
+    ./sorc/radar_reflectivity_mosaic.fd/include/zconf.h
+    ./sorc/radar_reflectivity_mosaic.fd/include/zlib.h
+    ./sorc/radar_reflectivity_mosaic.fd/maplib3d.cc
+    ./sorc/radar_reflectivity_mosaic.fd/get_index_temp.cc
+    ./sorc/radar_reflectivity_mosaic.fd/produce_HSR_and_HSRH_new.cc
+    ./sorc/radar_reflectivity_mosaic.fd/maplib3d.h
+    ./sorc/radar_reflectivity_mosaic.fd/DefineAndStruc.h
+    ./sorc/radar_reflectivity_mosaic.fd/NETCDF_HANDLER.h
+    ./sorc/radar_reflectivity_mosaic.fd/read_RUC_tsfc.cc
+    ./sorc/radar_reflectivity_mosaic.fd/produce_CREF_CREFH.cc
+    ./sorc/radar_reflectivity_mosaic.fd/NIDS_INFO.cc
+    ./sorc/radar_reflectivity_mosaic.fd/VERSION_NOTES
+    ./sorc/radar_reflectivity_mosaic.fd/produce_ETP.cc
+    ./sorc/radar_reflectivity_mosaic.fd/radar_sum.cc
+    ./sorc/radar_reflectivity_mosaic.fd/nids_output.h
+    ./sorc/radar_reflectivity_mosaic.fd/get_time_realtime.cc
+    ./sorc/radar_reflectivity_mosaic.fd/radar_sum.h
+    ./sorc/radar_reflectivity_mosaic.fd/read_sat_qc_mask.cc
+    ./sorc/radar_reflectivity_mosaic.fd/radarlib.cc
+    ./sorc/radar_reflectivity_mosaic.fd/qpesums_utility.cc
+    ./sorc/radar_reflectivity_mosaic.fd/produce_CREF_CREFH_new.cc
+    ./sorc/radar_reflectivity_mosaic.fd/produce_ETP_new.cc
+    ./sorc/radar_reflectivity_mosaic.fd/grid_vars.h
+    ./sorc/radar_reflectivity_mosaic.fd/src_mosaic_main.cc
+    ./sorc/radar_reflectivity_mosaic.fd/SOUNDING.cc
+    ./sorc/radar_reflectivity_mosaic.fd/setgrd.cc
+    ./sorc/radar_reflectivity_mosaic.fd/Makefile
+    ./sorc/radar_reflectivity_mosaic.fd/SRC_DATA_HEADER.h
+    ./sorc/radar_reflectivity_mosaic.fd/get_attr_realtime.cc
+    ./sorc/radar_reflectivity_mosaic.fd/CONFIG_PARS.h
+    ./sorc/radar_reflectivity_mosaic.fd/produce_PCPFLAG.cc
+    ./sorc/radar_reflectivity_mosaic.fd/readtrn.cc
+    ./sorc/radar_reflectivity_mosaic.fd/get_t_z_snd.cc
+    ./sorc/radar_reflectivity_mosaic.fd/output_mosaic_info.cc
+    ./sorc/radar_reflectivity_mosaic.fd/produce_PCPFLAG_new.cc
+    ./sorc/radar_reflectivity_mosaic.fd/i2wrt_cart3d.cc
+    ./sorc/radar_reflectivity_mosaic.fd/FuncSet.cc
+    ./sorc/radar_reflectivity_mosaic.fd/FuncSet.h
+    ./sorc/radar_reflectivity_mosaic.fd/produce_2D_products.cc
+    ./sorc/radar_reflectivity_mosaic.fd/NIDS_INFO.h
+    ./sorc/radar_reflectivity_mosaic.fd/mosaic_adapt_pars.h
+    ./sorc/radar_reflectivity_mosaic.fd/produce_VIL_and_VILD.cc
+    ./sorc/radar_reflectivity_mosaic.fd/phycst.h
+    ./sorc/radar_reflectivity_mosaic.fd/i2read_cart3d_conus.cc
+    ./sorc/radar_reflectivity_mosaic.fd/produce_HDA.cc
+    ./sorc/radar_reflectivity_mosaic.fd/grid_vars.cc
+    ./sorc/radar_reflectivity_mosaic.fd/produce_LCREF_and_LCREFH.cc
+    ./sorc/radar_reflectivity_mosaic.fd/func_prototype.h
+    ./sorc/radar_reflectivity_mosaic.fd/qpesums_utility.h
+    ./sorc/radar_reflectivity_mosaic.fd/produce_HSR_and_HSRH.cc
+    ./sorc/radar_reflectivity_mosaic.fd/chktime.cc
+    ./sorc/radar_reflectivity_mosaic.fd/produce_VIL_and_VILD_new.cc
+    ./sorc/radar_reflectivity_mosaic.fd/produce_HDA_new.cc
+    ./sorc/radar_reflectivity_mosaic.fd/NIDS_RASTER_HEADER.h
+    ./sorc/radar_reflectivity_mosaic.fd/SOUNDING.h
+    ./sorc/radar_reflectivity_mosaic.fd/get_current_vcp.cc
+    ./sorc/radar_reflectivity_mosaic.fd/CONFIG_PARS.cc
+    ./sorc/radar_reflectivity_mosaic.fd/produce_LCREF_and_LCREFH_new.cc
+    ./sorc/radar_reflectivity_mosaic.fd/setgrd.h
+    ./scripts/exradar_reflectivity_mosaic.pl.ecf
+  M ./jobs/JRADAR_REFLECTIVITY_MOSAIC
+
+( M - modified)
+
+
+ JOB script changes:
+   JRADAR_REFLECTIVITY_MOSAIC:
+    - transite to DELL and use NCO's new code standard.
+
+ EX script changes:
+    - No changes
+
+ Source code changes:
+    - No changes
+
+ Parm file changes:
+    - Change MOSAIC_WINDOW from 1500 seccond to 2700 second so that mosaic still can 
+      be generated when raw radar levelII data delay
+
+
+ Output changes:
+ ---------------
+    - No changes
+
+
+ Compute Resource Information:
+ -----------------------------
+    - #BSUB -W 00:10
+    - #BSUB -R span[ptile=8]
+    - #BSUB -R affinity[core(1):distribute=balance]
+    module information:
+   . /usrx/local/prod/lmod/lmod/init/ksh
+   module purge
+   module load EnvVars/1.0.2
+   module load lsf/10.1
+   module load ips/18.0.1.163
+   module load impi/18.0.1
+   module load CFP/2.0.2
+   module load prod_util/1.1.0
+   module load prod_envir/1.0.2
+   module list
+
+
+ Preimplementation Testing Requirements:
+ ---------------------------------------
+   - Test production job JRADAR_REFLECTIVITY_MOSAIC
+
+
+ Dissemination:
+ --------------
+   - The main users of this output are NAM networks and
+     radar_reflectivity_ref2grb job.
+   - No change in dissemination.
+   - No change in archival on HPSS.
+
+ Build Instructions:
+ -------------------
+   - compile the package:
+     1. cd  ${NWROOT}/radar.v1.0.0/sorc
+     2. build_mosaic.sh
+     4. cp ./radar_reflectivity_mosaic/radar_reflectivity_mosaic ${NWROOT}/radar.v1.0.0/exec
+
+
+ Special Instructions:
+ ---------------------
+     Please retrieve the radar.ver file:
+     git clone gerrit:EMC_obsproc
+     cd EMC_obsproc; git checkout master
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radar_reflectivity_mosaic release 1.1.2 - Apr 2, 2019
+
+Updated the job script to print out more information in case of missing mosaic files
+jobs/JRADAR_REFLECTIVITY_MOSAIC
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radar_reflectivity_mosaic release 1.1.0 --> released Jan 28, 2019
+
+Initial population of vertical structure.
+
+files:
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile1.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile2.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile3.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile4.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile5.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile6.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile7.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile8.config
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/include/zconf.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/include/zlib.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/maplib3d.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/get_index_temp.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_HSR_and_HSRH_new.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/maplib3d.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/DefineAndStruc.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/NETCDF_HANDLER.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/read_RUC_tsfc.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_CREF_CREFH.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/NIDS_INFO.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/VERSION_NOTES
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_ETP.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/radar_sum.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/nids_output.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/get_time_realtime.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/radar_sum.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/read_sat_qc_mask.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/radarlib.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/qpesums_utility.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_CREF_CREFH_new.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_ETP_new.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/grid_vars.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/src_mosaic_main.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/SOUNDING.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/setgrd.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/Makefile
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/SRC_DATA_HEADER.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/get_attr_realtime.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/CONFIG_PARS.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_PCPFLAG.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/readtrn.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/get_t_z_snd.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/output_mosaic_info.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_PCPFLAG_new.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/i2wrt_cart3d.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/FuncSet.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/FuncSet.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_2D_products.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/NIDS_INFO.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/mosaic_adapt_pars.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_VIL_and_VILD.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/phycst.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/i2read_cart3d_conus.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_HDA.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/grid_vars.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_LCREF_and_LCREFH.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/func_prototype.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/qpesums_utility.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_HSR_and_HSRH.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/chktime.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_VIL_and_VILD_new.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_HDA_new.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/NIDS_RASTER_HEADER.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/SOUNDING.h
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/get_current_vcp.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/CONFIG_PARS.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_LCREF_and_LCREFH_new.cc
+    radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/setgrd.h
+    radar_reflectivity_mosaic/scripts/exradar_reflectivity_mosaic.pl.ecf
+    radar_reflectivity_mosaic/jobs/JRADAR_REFLECTIVITY_MOSAIC
+
+( M - modified)
+
+
+ JOB script changes:
+   JRADAR_REFLECTIVITY_MOSAIC:
+    - No changes.
+
+ EX script changes:
+    - No changes
+
+ Source code changes:
+    - No changes
+
+ Parm file changes:
+    - Change MOSAIC_WINDOW from 1500 seccond to 2700 second so that mosaic still can 
+      be generated when raw radar levelII data delay
+
+
+ Output changes:
+ ---------------
+    - No changes
+
+
+ Compute Resource Information:
+ -----------------------------
+   No changes
+
+
+ Preimplementation Testing Requirements:
+ ---------------------------------------
+   - Test production job JRADAR_REFLECTIVITY_MOSAIC
+
+
+ Dissemination:
+ --------------
+   - The main users of this output are NAM networks and
+     radar_reflectivity_ref2grb job.
+   - No change in dissemination.
+   - No change in archival on HPSS.
+
+
+ Special Instructions:
+ ---------------------
+     Please retrieve the radar_reflectivity_mosaic.ver file:
+     git clone gerrit:EMC_obsproc
+     cd EMC_obsproc; git checkout master
+     cp versions/20180829_OBSPROC-v10.3.0/radar_reflectivity_mosaic.ver /nwprod/versions
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radar_reflectivity_mosaic release 1.0.0 --> released Aug 28, 2014
+                                        --> implemented Nov 4, 2014
+
+Initial population of vertical structure.
+
+files:
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile1.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile2.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile3.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile4.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile5.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile6.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile7.config
+  M radar_reflectivity_mosaic/parm/reflectivity_mosaic_tile8.config
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/include/zconf.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/include/zlib.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/maplib3d.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/get_index_temp.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_HSR_and_HSRH_new.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/maplib3d.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/DefineAndStruc.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/NETCDF_HANDLER.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/read_RUC_tsfc.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_CREF_CREFH.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/NIDS_INFO.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/VERSION_NOTES
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_ETP.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/radar_sum.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/nids_output.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/get_time_realtime.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/radar_sum.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/read_sat_qc_mask.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/radarlib.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/qpesums_utility.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_CREF_CREFH_new.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_ETP_new.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/grid_vars.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/src_mosaic_main.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/SOUNDING.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/setgrd.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/Makefile
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/SRC_DATA_HEADER.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/get_attr_realtime.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/CONFIG_PARS.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_PCPFLAG.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/readtrn.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/get_t_z_snd.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/output_mosaic_info.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_PCPFLAG_new.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/i2wrt_cart3d.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/FuncSet.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/FuncSet.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_2D_products.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/NIDS_INFO.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/mosaic_adapt_pars.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_VIL_and_VILD.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/phycst.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/i2read_cart3d_conus.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_HDA.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/grid_vars.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_LCREF_and_LCREFH.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/func_prototype.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/qpesums_utility.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_HSR_and_HSRH.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/chktime.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_VIL_and_VILD_new.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_HDA_new.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/NIDS_RASTER_HEADER.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/SOUNDING.h
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/get_current_vcp.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/CONFIG_PARS.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/produce_LCREF_and_LCREFH_new.cc
+  M radar_reflectivity_mosaic/sorc/radar_reflectivity_mosaic.fd/setgrd.h
+  M radar_reflectivity_mosaic/scripts/exradar_reflectivity_mosaic.pl.ecf
+  M radar_reflectivity_mosaic/jobs/JRADAR_REFLECTIVITY_MOSAIC
+
+( M - modified)
+
+
+ JOB script changes:
+   JRADAR_REFLECTIVITY_MOSAIC:
+    - Environment variable nwprodhome now defaults to new vertical structure
+      directory.
+    - Environment variable radar_reflectivity_mosaic_ver is used to control
+      the version number.
+    - Environment variable hisdir is defined as directory to store the mosaic
+      run history for 15 minute mosaic product.
+    - Job script now includes the function of checking mosaic data recorder
+      and processing up to four mosaic data based on history recorder. 
+
+ EX script changes:
+   exradar_reflectivity_mosaic.pl.ecf:
+    - in the script, now the time variables are input parameters from JOB
+      scripts. It is more portable than the prior version. The new script can
+      process dump mosaic at any minute as needed in JOB scripts
+
+ Source code changes:
+    - Move to vertical structure.
+
+ Parm file changes:
+    - Move to vertical structure.
+
+
+ Output changes:
+ ---------------
+   JRADAR_REFLECTIVITY_MOSAIC:
+    - Reflectivity in 8 tiles will be generated every 15 minutes.
+    - A history file radar_mosaic.history to record the processed mosaic data
+      is generated in /dcom/us007003/nexrad_level2
+
+
+ Compute Resource Information:
+ -----------------------------
+   JRADAR_REFLECTIVITY_MOSAIC:
+    -  the mosaic product in 8 tiles in /com/hourly/prod/radar.yyyymmddhh/ will
+       now be 4 times (400%) as large as before since the product is now dumped
+       every 15 minutes rather than every 60 minutes.
+    - the job should be submitted every 15 minutes at 01, 15, 31, 46.
+   No change in requested resources in the job cards.
+   No change to memory usage.
+
+
+ Preimplementation Testing Requirements:
+ ---------------------------------------
+   - Test production job JRADAR_REFLECTIVITY_MOSAIC as part of the parallel-
+     production test of the OBSPROC FY14Q4 bundle.
+
+
+ Dissemination:
+ --------------
+   - The main users of this output are RAP networks and
+     radar_reflectivity_ref2grb job.
+   - No change in dissemination.
+   - No change in archival on HPSS.
+
+
+ Special Instructions:
+ ---------------------
+   This is part of OBSPROC.v4.0.0.
+   This must be implemented simultaneously with the implementations of:
+      v1.2.1 of obsproc_dump_monitor,
+      v2.0.2 of obsproc_global, obsproc_nam, obsproc_rap, obsproc_rtma,
+      v2.0.2 of obsproc_urma,
+      v2.3.0 of obsproc_satingest,
+      v3.2.0 of obsproc_dump, obsproc_prep,
+      v2.0.1 of obsproc_prep_post,
+      v1.0.0 of obsproc_dump_alert, radar_reflectivity_ref2grb,
+      v1.0.1 of obsproc_shared/bufr_avgdata.
+
+   Please export file
+   https://svnemc.ncep.noaa.gov/projects/obsproc/branches/VS/versions/RADAR/20140828_RADAR-fy14q4/radar_reflectivity_mosaic.ver
+   and copy to /nwprod/versions.
+   (lowest sub-directory later renamed to 20140828_OBSPROC.v4.0.0)
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

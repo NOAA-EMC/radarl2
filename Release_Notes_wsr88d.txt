@@ -1,0 +1,473 @@
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radar_level2.v1.1.1---wsr88d_level2 release 1.1.1 --> released Oct 07, 2021
+
+ code changes:
+ M  ./jobs/JRADAR_LEVEL2:
+    - set NUMPROC=32 since LSB_DJOB_NUMPROC is not available in PBS and 
+      `wc -l < $PBS_NODEFILE` not work in cfp mode 
+ M ./jobs/JRADAR_REFLECTIVITY_MOSAIC
+    - use mpiexec to submit job
+ M ./scripts/exradar_reflectivity_ref2grb.sh.ecf
+    - use mpiexec to submit job
+ M ./sorc/build_wsr88d.sh
+    - use build.ver and run.ver
+ M ./sorc/wsr88d_level2.fd/level2_qc_lib/nssl_reflec_src.fd/Makefile
+ M ./sorc/wsr88d_level2.fd/level2_qc_lib/ncep_vr_qc.fd/makefile
+ M ./sorc/wsr88d_level2.fd/Makefile
+   -remove -xhost
+ D ./sorc/loadmod
+ D ./sorc/loadmod_level2
+ D ./sorc/readme-JY
+ D ./sorc/FOR_SPA
+   - delete loadmod and unnecessary notes
+ N ./version/build.ver
+ N ./version/run.ver
+ N ./modulefiles/v1.1.1
+   - add build.ver, run.ver and modulefiles directory
+ N ./ecf/dev/jradar_level2.ecf
+ N ./ecf/dev/jradar_reflectivity_mosaic.ecf
+ N ./ecf/dev/jradar_reflectivity_ref2grb.ecf
+   - add pbs job submit scripts
+ 
+  
+Computation resource:
+  JRADAR_LEVEL2:
+  #!/bin/bash
+  #PBS -N jradar_level2
+  #PBS -j oe 
+  #PBS -A NAM-DEV
+  #PBS -l place=vscatter,select=1:ncpus=32
+  #PBS -q dev
+  #PBS -l walltime=00:15:00
+note: here, ncpus should match NUMPROC in JRADAR_LEVEL2
+
+  jradar_reflectivity_mosaic:
+  #!/bin/bash
+  #PBS -N jradar_reflectivity_mosaic
+  #PBS -j oe
+  #PBS -A NAM-DEV
+  #PBS -q dev
+  #PBS -l select=1:ncpus=8
+  #PBS -l walltime=00:10:00
+
+  jradar_reflectivity_ref2grb:
+  #!/bin/bash
+  #PBS -N jradar_reflectivity_ref2grb
+  #PBS -j oe
+  #PBS -A NAM-DEV
+  #PBS -q dev
+  #PBS -l select=1:ncpus=8:mem=500GB
+  #PBS -l walltime=00:10:00 
+  
+
+  Special Instructions:
+   ---------------------
+       Please retrieve EMC_radar_level2:
+       git clone gerrit:EMC_radar_level2
+       cd EMC_radar_level2; git checkout master
+
+       cp -p -r /gpfs/dell1/nco/ops/nwprod/radar_level2.v1.1.0/fix ./radar_level2.v1.1.1
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radar_level2.v1.1.0---wsr88d_level2 release 1.1.0 --> released Feb 05, 2020
+
+ JOB script changes:
+ M  radar_level2.v1.1.0/jobs/JRADAR_LEVEL2:
+    - combine bufr files and reduce the times of calling "bufr-tranjb"
+
+  Special Instructions:
+   ---------------------
+       Please retrieve EMC_radar_level2:
+       git clone gerrit:EMC_radar_level2
+       cd EMC_radar_level2; git checkout master
+
+       Please retrieve the radar_level2.ver file:
+       git clone ssh://$USER@vlab.ncep.noaa.gov:29418/EMC_obsproc
+       cd EMC_obsproc; git checkout master
+       cp versions/20200227_OBSPROC-v12.5.0/radar_level2.ver $NWROOT/versions
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radar_level2.v1.0.0---wsr88d_level2 release 1.0.0 --> released Oct 10, 2019
+
+Initial population of vertical structure.
+
+files:
+    sorc/wsr88d_level2/combine_radials.c
+    sorc/wsr88d_level2/get_memory.c
+    sorc/wsr88d_level2/le_logerr.c
+    sorc/wsr88d_level2/message31_decoder.c
+    sorc/wsr88d_level2/message31sw.c
+    sorc/wsr88d_level2/misc_table.c
+    sorc/wsr88d_level2/nop3.c
+    sorc/wsr88d_level2/orpggdr.c
+    sorc/wsr88d_level2/pbd_process_data.c
+    sorc/wsr88d_level2/recomb_dp_fields.c
+    sorc/wsr88d_level2/str.c
+    sorc/wsr88d_level2/wsr88d.c
+    sorc/wsr88d_level2/build10_recomb.f90
+    sorc/wsr88d_level2/build10_superres.f90
+    sorc/wsr88d_level2/build8_qc_bufr.f90
+    sorc/wsr88d_level2/CONFIG_PARS.f90
+    sorc/wsr88d_level2/Makefile
+    sorc/wsr88d_level2/loadmod
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/area0vr_rm.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/azimcontr.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/cal_vadvel.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/classical_VAD.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/CONFIG_PARS.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/continue_check.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/convert2.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/convert2_two.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/convert4.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/convert4.f90_shun
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/convert4_two.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/cost_function.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/datasort.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/dealiase_main.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/dealias.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/decide_first_tilt.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/decide_vadflag.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/dpqc.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/dumpvar.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/ex_prep_radar.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/ex_setup_radar.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/extr_dealiase_main.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/filling_spval.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/full_profile.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/gatecontr.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/get_config.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/get_k121.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/get_mark.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/get_residual.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/get_u0v0.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/gradient_fst_0Vr.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/indexx.f
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/line_regression.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/maproj3d.f
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/median.f.cp
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/memfun_ap.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/memfun_sc.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/multi_check_driver.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/NoiseFltr.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/noise_rm.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/nssl_qcmain.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/num_signavg1.f
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/num_signavg.f
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/num_sign.f
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/orig_radar.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/output_for_NetCDF_convert.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/pbl2bufr.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/Pre_Data_Anaylsis.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/prep_radar.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/profile_continue_qc.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/profile_differ_qc.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/qcmain.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/qc_nonm.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/radarlib3d.f
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/read_namelist.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/read_radar.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/readraw.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/reference_check.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/RemvPattern.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/search_min.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/setapecho.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/setup_circle.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/setup_noise_remove.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/setup_radar.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/setup_wind_profile.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/slctbeam.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/sort2.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/std_dev.f
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/SunBeamFltr.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/tendency_0Vr.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/tendency_method.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/unfold_simple.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/vad2bufr.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/VADLSF.f
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/vadtilt_check.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/var.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/variable_define.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/write_radar.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/xytorth.f90
+    sorc/wsr88d_level2/level2_qc_lib/ncep_vr_qc.fd/makefile
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/alignment.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/BRIGHTBAND.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/compare_tilt_lut.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/CONFIG_PARS.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/cp_get_config.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/dataSelect.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/get_brightband.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/get_radattr_realtime.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/ini_grd.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/maplib3d.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/mosaic_adapt_pars.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/PHYCST.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/RADAR2.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/read_RUCWindField.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/readTiltData.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/readtrn_func.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/rearrange.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/reflectivity.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/set_grd.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/src.f90
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/src.f90_32bit
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/src.f90_64bit
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/Makefile
+    sorc/wsr88d_level2/level2_qc_lib/nssl_reflec_src.fd/makefile_64
+
+( M - modified   A - new added)
+
+
+ JOB script changes:
+    radar_level2.v1.0.0/jobs/JRADAR_LEVEL2:
+    - modified to transit to DELL
+
+ EX script changes:
+    radar_level2.14.0.0/scripts/exradar_level2.sh.ecf:
+    - modified to transit to DELL
+
+ Source code changes:
+    - makefiles were changed to use the variables in modules
+
+ Output changes:
+ ---------------
+    - No changes
+
+
+ Compute Resource Information:
+ -----------------------------
+   - see /gpfs/dell2/emc/modeling/noscrub/Shun.Liu/radar_level2.v1.0.0/jobs/sub_level2.sh
+   - 
+
+
+ Preimplementation Testing Requirements:
+ ---------------------------------------
+   - #BSUB -W 00:15
+   - #BSUB -R span[ptile=15]
+   - #BSUB -R affinity[core(1)]
+   - #BSUB -n 30
+   
+   module information:
+   . /usrx/local/prod/lmod/lmod/init/ksh
+   module purge
+   module load EnvVars/1.0.2
+   module load lsf/10.1
+   module load ips/18.0.1.163
+   module load impi/18.0.1
+   module load prod_util/1.1.0
+   module load prod_envir/1.0.2
+   module load gempak/7.3.1
+   module load grib_util/1.1.1
+   module list
+
+
+ Dissemination:
+ --------------
+   - The main users of this output are NAM/RAP/HRRR networks,
+     radar_reflectivity_mosaic and radar_reflectivity_ref2grb job.
+   - No change in archival on HPSS.
+
+
+ Special Instructions:
+ ---------------------
+     Please retrieve the radar.ver file:
+     git clone gerrit:EMC_obsproc
+     cd EMC_obsproc; git checkout master
+
+     Please copy 
+   - cp -p -r /gpfs/gp1/nco/ops/nwprod/decoders/wsr88d_level2.v4.0.0/fix ${NWROOT}/radar.v1.0.0
+   - compile package step
+     1. cd ${NWROOT}/radar.v1.0.0/sorc
+     2. loadmod_wsr88d
+     3. build_wsr88d.sh
+     6. cp ${NWROOT}/radar.v1.0.0/sorc/wsr88d_level2/wsr88d_level2 ../../exec
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+wsr88d_level2.v4.0.0 release 4.0.0 --> released Mar 11, 2019
+
+Initial population of vertical structure.
+
+files:
+    wsr88d_level2.v4.0.0/sorc/combine_radials.c
+    wsr88d_level2.v4.0.0/sorc/get_memory.c
+    wsr88d_level2.v4.0.0/sorc/le_logerr.c
+  M wsr88d_level2.v4.0.0/sorc/message31_decoder.c
+    wsr88d_level2.v4.0.0/sorc/message31sw.c
+    wsr88d_level2.v4.0.0/sorc/misc_table.c
+    wsr88d_level2.v4.0.0/sorc/nop3.c
+    wsr88d_level2.v4.0.0/sorc/orpggdr.c
+    wsr88d_level2.v4.0.0/sorc/pbd_process_data.c
+    wsr88d_level2.v4.0.0/sorc/recomb_dp_fields.c
+    wsr88d_level2.v4.0.0/sorc/str.c
+    wsr88d_level2.v4.0.0/sorc/wsr88d.c
+  M wsr88d_level2.v4.0.0/sorc/build10_recomb.f90
+    wsr88d_level2.v4.0.0/sorc/build10_superres.f90
+    wsr88d_level2.v4.0.0/sorc/build8_qc_bufr.f90
+    wsr88d_level2.v4.0.0/sorc/CONFIG_PARS.f90
+    wsr88d_level2.v4.0.0/sorc/Makefile
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/area0vr_rm.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/azimcontr.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/cal_vadvel.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/classical_VAD.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/CONFIG_PARS.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/continue_check.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/convert2.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/convert2_two.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/convert4.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/convert4.f90_shun
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/convert4_two.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/cost_function.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/datasort.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/dealiase_main.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/dealias.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/decide_first_tilt.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/decide_vadflag.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/dpqc.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/dumpvar.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/ex_prep_radar.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/ex_setup_radar.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/extr_dealiase_main.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/filling_spval.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/full_profile.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/gatecontr.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/get_config.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/get_k121.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/get_mark.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/get_residual.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/get_u0v0.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/gradient_fst_0Vr.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/indexx.f
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/line_regression.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/maproj3d.f
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/median.f.cp
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/memfun_ap.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/memfun_sc.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/multi_check_driver.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/NoiseFltr.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/noise_rm.f90
+  M wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/nssl_qcmain.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/num_signavg1.f
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/num_signavg.f
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/num_sign.f
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/orig_radar.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/output_for_NetCDF_convert.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/pbl2bufr.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/Pre_Data_Anaylsis.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/prep_radar.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/profile_continue_qc.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/profile_differ_qc.f90
+  M wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/qcmain.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/qc_nonm.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/radarlib3d.f
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/read_namelist.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/read_radar.f90
+  M wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/readraw.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/reference_check.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/RemvPattern.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/search_min.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/setapecho.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/setup_circle.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/setup_noise_remove.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/setup_radar.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/setup_wind_profile.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/slctbeam.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/sort2.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/std_dev.f
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/SunBeamFltr.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/tendency_0Vr.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/tendency_method.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/unfold_simple.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/vad2bufr.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/VADLSF.f
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/vadtilt_check.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/var.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/variable_define.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/write_radar.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/xytorth.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/ncep_vr_qc.fd/makefile
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/alignment.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/BRIGHTBAND.f90
+  M wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/compare_tilt_lut.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/CONFIG_PARS.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/cp_get_config.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/dataSelect.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/get_brightband.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/get_radattr_realtime.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/ini_grd.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/maplib3d.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/mosaic_adapt_pars.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/PHYCST.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/RADAR2.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/read_RUCWindField.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/readTiltData.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/readtrn_func.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/rearrange.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/reflectivity.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/set_grd.f90
+  M wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/src.f90
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/src.f90_32bit
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/src.f90_64bit
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/Makefile
+    wsr88d_level2.v4.0.0/sorc/level2_qc_lib/nssl_reflec_src.fd/makefile_64
+
+( M - modified)
+
+
+ JOB script changes:
+   JRADAR_LEVEL2:
+    - No changes.
+
+ EX script changes:
+    - No changes
+
+ Source code changes:
+    - No changes
+
+ Output changes:
+ ---------------
+    - No changes
+
+
+ Compute Resource Information:
+ -----------------------------
+   No changes
+
+
+ Preimplementation Testing Requirements:
+ ---------------------------------------
+   - Test production job JRADAR_LEVEL2
+
+
+ Dissemination:
+ --------------
+   - The main users of this output are NAM networks,
+     radar_reflectivity_mosaic and radar_reflectivity_ref2grb job.
+   - No change in dissemination.
+   - No change in archival on HPSS.
+
+
+ Special Instructions:
+ ---------------------
+     Please copy 
+   - cp /meso/save/Shun.Liu/nwprod/decoders/wsr88d_level2.v4.0.0/sorc /nwprod/decoders/wsr88d_level2.v4.0.0
+   - cp /meso/save/Shun.Liu/nwprod/decoders/wsr88d_level2.v4.0.0/include /nwprod/decoders/wsr88d_level2.v4.0.0
+   - cp /nwprod/decoders/wsr88d_level2.v3.1.0/include /nwprod/decoders/wsr88d_level2.v4.0.0
+   - cp /nwprod/decoders/wsr88d_level2.v3.1.0/fix /nwprod/decoders/wsr88d_level2.v4.0.0
+   - cp /nwprod/decoders/wsr88d_level2.v3.1.0/exec /nwprod/decoders/wsr88d_level2.v4.0.0
+   - cp /nwprod/decoders/wsr88d_level2.v3.1.0/scripts /nwprod/decoders/wsr88d_level2.v4.0.0
+   - cp /nwprod/decoders/wsr88d_level2.v3.1.0/ecf /nwprod/decoders/wsr88d_level2.v4.0.0
+   - cp /nwprod/decoders/wsr88d_level2.v3.1.0/jobs /nwprod/decoders/wsr88d_level2.v4.0.0
+   - update /nwprod/versions/wsr88d_level2.ve
+   - compile package step
+     1. cd /nw${envir}/decoders/wsr88d_level2.v4.0.0/sorc
+     2. cd level2_qc_lib
+     3. cd ncep_vr_qc.fd; make
+     4. cd ../nssl_reflec_src.fd; make
+     5. cd /nw${envir}/decoders/wsr88d_level2.v4.0.0/sorc; make 
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

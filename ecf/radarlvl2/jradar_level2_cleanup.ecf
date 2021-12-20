@@ -1,0 +1,42 @@
+#BSUB -J jradar_level2_cleanup
+#BSUB -o /com/output/%SUITE%/today/radar_level2_cleanup.o%J
+#BSUB -L /bin/sh
+#BSUB -cwd /tmpnwprd
+#BSUB -W 01:00
+#BSUB -P %PROJ%-%PROJENVIR%
+#BSUB -q prod_shared
+#BSUB -R "rusage[mem=500]" -R "affinity[core]"
+
+%include <head.h>
+
+# EXPORT list here
+export envir=%ENVIR%
+#export w2run=prod
+export job=`date -u +radar_level2_cleanup%%H%%M`
+export cyc=`date -u +%%H`
+
+# CALL executable job script here
+
+/nw$envir/jobs/JRADAR_LEVEL2_CLEANUP
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${SMSNAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+%include <tail.h>
+%manual
+######################################################################
+# Purpose: To process the level 2 radar data
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end
+

@@ -1,0 +1,51 @@
+#PBS -N radarl2_%TIME%
+#PBS -j oe
+#PBS -S /bin/bash
+#PBS -q %QUEUE%
+#PBS -A %PROJ%-%PROJENVIR%
+#!#PBS -l place=vscatter,select=1:ncpus=32:mem=10000MB
+#PBS -l place=vscatter,select=1:ncpus=32:mem=35GB
+#PBS -l walltime=00:15:00
+#PBS -l debug=true
+
+# From dev: note: here, ncpus should match NUMPROC
+#
+model=radarl2
+%include <head.h>
+%include <envir-p1.h>
+
+module load PrgEnv-intel/$PrgEnv_intel_ver
+module load intel/$intel_ver
+module load craype/$craype_ver
+module load cray-mpich/$cray_mpich_ver
+module load cray-pals/$cray_pals_ver
+module load cfp/$cfp_ver
+module load bufr_tranjb/$bufr_tranjb_ver
+module list
+
+# EXPORT list here
+export envir=%ENVIR%
+#export job=radar_level2
+##export job=`date -u +radar_level2_%%H%%M`
+export cyc=`date -u +%%H`
+#export TIME_FLAG=YES
+
+# CALL executable job script here
+
+$HOMEradarl2/jobs/JRADAR_LEVEL2
+
+%include <tail.h>
+%manual
+######################################################################
+# Purpose: To process the level 2 radar data
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end
+

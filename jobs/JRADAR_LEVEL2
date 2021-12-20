@@ -1,0 +1,472 @@
+#!/bin/sh
+
+#===============================================================
+# This job processes the level II radar bzip compressed data. The 
+# following steps are performed by various programs: (1) wsr88d_level2 main 
+# program uncompresses data using bzip2 library, decodes the relevant fields 
+# and feeds data into reflectivity and radial wind QC codes and writes the
+# QC-ed BUFR reflectivity, BUFR radial wind fields and other QC diagnostics 
+# into /dcom tanks (2) performs nssl reflectvity QC by the library code 
+# nssl_reflec_qc.fd (3) performs nssl radial velocity QC by the library code 
+# ncep_vr_qc.fd (4) generates reflectivity single radar co-ordinate (SRC) data
+# by the nssl library code nssl_reflec_src.fd for input to mosaic processing codes 
+# Original Authors: V. Krishna Kumar NCO/Systems Integration Branch 05-01-2008 &
+# Shun Liu EMC/Mesoscale Modeling Branch 05-01-2008.
+#===============================================================
+ 
+#set -xa
+
+export MP_DEBUG_NOTIMEOUT=no
+export MP_SHARED_MEMORY=yes
+
+# ##############################
+# SET SHELL PROCESSING VARIABLES
+# ##############################
+export PS4='MAIN:$SECONDS + '
+
+####################################
+# obtain unique process id (pid) and make temp directory
+####################################
+#export job=level2
+export pid=$$
+echo ${pid} , ${job}
+#if [[ ${envir} == prod ]]; then
+#   TMPhome=/tmpnwprd1
+#    export DATA=${DATA:-${DATAROOT:?}/${jobid:?}} 
+#else
+#    TMPhome=/tmpnwprd2
+#fi
+#export DATA=${DATA:-$TMPhome/${job}.${pid}}
+
+#export DATA=${DATA:-${DATAROOT:?}/${jobid:?}} 
+export DATA=${DATA:-${DATAROOT:?}/${job}.${pid}} 
+export jlogfile=$DATA/jlogfile
+mkdir -p $DATA
+cd $DATA
+date
+export time=`date -u "+%Y%m%d%H%M"`
+echo $time
+echo `date`
+
+export cycle=t${cyc}z
+export DATAO=$DATA
+
+####################################
+# Specify NET and RUN Name and model
+####################################
+export NET=radarl2
+#export NET=radar
+#export model=radar
+
+####################################
+# File To Log Msgs
+####################################
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+
+####################################
+# Specify Execution Areas
+####################################
+# JY export HOMEradarl2=${HOMEradarl2:-${NWROOT}/radar.${radar_ver}}
+export EXECradar=$HOMEradarl2/exec
+export FIXradar=$HOMEradarl2/fix
+export SCRIPTradar=$HOMEradarl2/scripts
+
+# JY export HOMEbufr=${HOMEbufr:-${OPSROOT}/decoders/decod_shared}
+export HOMEbufr=${HOMEbufr:-${OPSROOT}/../prod/decoders/decod_shared}
+export FIXbufr=$HOMEbufr/fix
+export DICbufr=$HOMEbufr/dictionaries
+
+#export HOMEsatingest=${HOMEsatingest:-$NWROOTp3/obsproc_satingest.${obsproc_satingest_ver}}
+#export USHsatingest=${HOMEsatingest}/ush
+#export EXECobsproc_satingest=${HOMEsatingest}/exec
+
+# JY export COMOUT_SRCtank=${COMOUT_SRCtank:-$COMROOT/${NET}/SRCtank}
+export COMOUT_SRCtank=${COMOUT_SRCtank:-$(compath.py -o ${NET}/${radarl2_ver}/SRCtank)}
+mkdir -p -m 775 ${COMOUT_SRCtank}
+
+##############################
+# Set up the UTILITIES
+##############################
+
+##############################
+# Run setup to initialize working directory and utility scripts
+##############################
+
+##############################
+# Run setpdy and initialize PDY variables
+##############################
+setpdy.sh
+. ./PDY
+
+
+export COMIN=${COMIN:-${DCOMROOT}/ldmdata/obs/upperair/nexrad_level2}
+#export COMIN=${COMIN:-${DCOMROOT}/us007003/ldmdata/obs/upperair/nexrad_level2}
+export INDIR=$COMIN
+
+# JY the following are IN and OUT
+# JY export DCOM_IN=${DCOM_IN:-${DCOMROOT}/nexrad_level2}
+export DCOM_IN=${DCOM_IN:-${DCOMROOT}/../../${envir}/dcom/nexrad_level2}
+# JY export DCOM_OUT=${DCOM_OUT:-${DCOMROOT}}
+# /lfs/h1/ops/${envir}/dcom
+export DCOM_OUT=${DCOM_OUT:-${DCOMROOT}/../../${envir}/dcom}
+export log=${log:-$DCOM_OUT/decoder_logs/tranjb_nexrad_2p0.out}
+
+mkdir -p $DCOM_OUT/nexrad_level2/QC_INFO $DCOM_OUT/decoder_logs/
+env
+
+#############################################################
+# execute the scripts
+ 
+msg="NEXRAD LEVEL 2 RADIAL WIND AND REFLECTIVITY PROCESSING HAS BEGUN on \
+`hostname`"
+postmsg "$msg"
+
+set -x
+#export NUMPROC=$LSB_DJOB_NUMPROC
+export NUMPROC=$NCPUS
+cp $FIXbufr/bufrtab.006 ./.
+cp $FIXbufr/bufrtab.002 ./.
+cp $FIXbufr/bufrtab.007 ./.
+cp $DICbufr/nexrad.tbl ./.
+cp $FIXradar/mosaic.table ./.
+
+
+ls $COMIN > stations_list
+total_stns=`ls $COMIN | wc -l`
+
+listperproc=`expr $total_stns / $NUMPROC`
+echo "List per processor = $listperproc"
+
+msg="Total number of stations is $total_stns - each parallel task will process\
+ $listperproc stations"
+postmsg "$msg"
+
+##
+##---------------------------------------------------------------------
+##
+
+cal_total_stns=`expr $listperproc \* $NUMPROC`
+nstns=0
+while [ "$nstns" -lt "$total_stns" ]
+do
+      nstns=`expr $nstns + 1`
+      if [ $nstns -lt $cal_total_stns ]; then
+      procn=`expr \( $nstns - 1 \) / $listperproc + 1`
+      else
+      procn=`expr $nstns - $cal_total_stns + 1`
+      fi
+      read x
+      echo $x >> list_$procn
+      echo nstns= $nstns
+done <stations_list
+
+##
+##---------------------------------------------------------------------
+##
+
+
+tlist=`ls list*`
+
+nlists=0
+for tl in $tlist
+do
+    nlists=`expr $nlists + 1`
+    echo `cat $tl` > file.station_$nlists
+done
+
+##
+##---------------------------------------------------------------------
+##
+
+##
+## delete if number_of_processors file is present already
+##
+#rm -rf number_of_processors
+
+##
+## Create a dummy process if the number of processors actually required is
+## less than the alloted number of processors
+
+numlist=`ls list* | wc -l`
+
+while [ "$numlist" -lt "$NUMPROC" ] 
+do
+   numlist=`expr $numlist + 1`
+   touch list_$numlist
+done
+
+##
+mlists=0
+for im in `ls list_*`
+do
+    mlists=`expr $mlists + 1`
+    echo $mlists >> number_of_processors
+done
+
+#export n_proc=`tail -1 number_of_processors`
+export n_proc=`cat number_of_processors`
+echo $n_proc
+
+# MPI debugging variables.  Don't always need.
+
+#poe hostname
+
+#
+# Create individual poe scripts
+#
+export nproc=$n_proc
+#
+            
+for proc in $nproc
+do
+    cat <<EOF > poescript$proc
+
+    echo $DISPLAY
+    hostname
+    DATA_TMP=$DATA
+
+    export DATA=\$DATA_TMP/TASK$proc
+    mkdir \$DATA
+    cd \$DATA
+
+#   $utilscript/setup.sh
+#   setup.sh
+
+    #cp $DATAO/prep_step .
+    cp $DATAO/file.station_${proc} .
+    cp $EXECradar/wsr88d_level2 ./.
+    cp $FIXbufr/bufrtab.006 ./.
+    cp $FIXbufr/bufrtab.002 ./.
+    cp $FIXbufr/bufrtab.007 ./.
+    cp $DICbufr/nexrad.tbl ./.
+    cp $FIXradar/mosaic.table ./.
+
+    sh $SCRIPTradar/exradar_level2.sh $proc
+
+EOF
+
+done
+
+#
+# Create master poescript
+#
+
+cat /dev/null > poescript
+for proc in $nproc
+do
+    chmod 775 ./poescript$proc
+    if [ $proc -eq 1 ] ; then
+       echo "./poescript$proc" > poescript
+    else
+       echo "./poescript$proc" >> poescript
+    fi
+done
+
+chmod 775 poescript
+#export MP_PGMMODEL=mpmd
+export CMDFILE=poescript
+export MP_LABELIO=NO
+
+#
+# Execute the script.
+
+msg="Begin poe"
+
+#mpirun.lsf -cmdfile poescript
+#mpirun -configure $CMDFILE
+#mpirun -l cfp  $CMDFILE
+mpiexec -np $NUMPROC --cpu-bind verbose,core cfp ./poescript
+
+
+echo "Ending Poe  : `date`"
+
+export err=$?; err_chk
+
+
+###
+### cat the final bufr files from each task to
+### one bufr file
+###
+
+
+for proc in $nproc
+do
+    cp $DATA/TASK$proc/bufrout.task$proc $DATA/.
+    cp $DATA/TASK$proc/vadbufrout.task$proc $DATA/.
+    cp $DATA/TASK$proc/pblbufrout.task$proc $DATA/.
+done
+
+for proc in $nproc
+do
+    cat bufrout.task$proc >> bufrout_total.stations
+    cat vadbufrout.task$proc >> vadbufrout_total.stations
+    cat pblbufrout.task$proc >> pblbufrout_total.stations
+done
+
+#
+# cleanup all the bufrout.task# files in $DATA and $DATA/TASK*
+# $DATA/TASK*/*bz2_bufr $DATA/TASK*/*bufrtab.006
+#
+ls -l bufrout* > bufr_filesizes    
+
+#/bin/rm -rf bufrout.task*
+#/bin/rm -rf $DATA/TASK*/bufrout.task*
+find $DATA -name '*bz2_bufr' -exec ls {} \;  > list_un_com_bufr_files
+find $DATA -name '*temp*' -exec /bin/rm -rf {} \; 
+#/bin/rm -rf $DATA/bufrtab.006
+/bin/rm -rf $DATA/nexrad.tbl
+/bin/rm -rf $DATA/TASK*/bufrtab.006
+/bin/rm -rf $DATA/TASK*/nexrad.tbl
+
+
+if [ ! -s bufrout_total.stations ]
+then
+
+   msg="***WARNING: COMBINED STATION BUFR FILE NOT FOUND, TRANJB DID NOT \
+RUN - NO LEVEL 2 RADAR DATA PROCESSED"
+   postmsg "$msg"
+
+else
+
+   set +x
+   echo
+   echo "--------------------------------------------------------------------"
+   echo "START TRANJB TO PUT BUFR DATA INTO TANKS IN $DCOM_OUT"
+   echo "--------------------------------------------------------------------"
+   echo
+   set -x
+
+   export cword=no
+   export SUBDATE_CHECK=NO
+
+   export log=$DCOM_OUT/tranjb_nexrad_2p0.out
+#  $USHsatingest/bufr_tranjb.sh $DCOM_OUT ./bufrout_total.stations
+   nbufr=0
+   tbufr=8 #total bufr files in tranjb job
+   gbufr=`expr $NUMPROC / $tbufr + 1`  #how many file in each bufr group
+   while [ $nbufr -lt $NUMPROC ]
+   do
+     nbufr=`expr $nbufr + 1`
+     thisbufr=`expr \( $nbufr - 1 \) / $gbufr + 1`
+     cat bufrout.task$nbufr >> bufrout.g$thisbufr
+   done
+
+   for i in `seq 1 $tbufr`
+   do
+     #$USHsatingest/bufr_tranjb.sh $DCOM_OUT ./bufrout.g$i
+     $TRANush $DCOM_OUT ./bufrout.task$i
+   done
+
+
+#  for i in `seq 1 $NUMPROC`
+#  do
+#    $USHsatingest/bufr_tranjb.sh $DCOM_OUT ./bufrout.task$i
+#  done
+   err=$?
+   if [ $err -eq 0 ]
+   then
+      msg="TRANJB completed normally"
+      postmsg  "$msg"
+#
+# cleanup the bufrout total file in $DATA after running tranjb
+#
+
+#/bin/rm -rf $DATA/bufrout_total.stations
+#find $DATA -name '*uncom*' -exec /bin/rm -rf {} \; 
+
+   else
+
+      msg="**ERROR: TRANJB FAILED with r.c. $err - NO LEVEL 2 RADAR DATA \
+PROCESSED --> non-fatal"
+      postmsg "$jlogfile" "$msg"
+#
+# cleanup the bufrout total file in $DATA after tranjb failed with an error
+#
+
+#      /bin/rm -rf $DATA/bufrout_total.stations
+#      find $DATA -name '*uncom*' -exec /bin/rm -rf {} \; 
+
+   fi
+   export log=$DCOM_OUT/tranjb_nexrad_vad.out
+   #$USHsatingest/bufr_tranjb.sh $DCOM_OUT ./vadbufrout_total.stations
+   $TRANush $DCOM_OUT ./vadbufrout_total.stations
+   
+   err=$?
+   if [ $err -eq 0 ]
+   then
+      msg="TRANJB completed normally----levelII vad wind"
+      postmsg "$msg"
+#
+# cleanup the bufrout total file in $DATA after running tranjb
+#
+
+#/bin/rm -rf $DATA/bufrout_total.stations
+#find $DATA -name '*uncom*' -exec /bin/rm -rf {} \; 
+
+   else
+
+      msg="**ERROR: TRANJB FAILED with r.c. $err - NO LEVEL 2 vad wind RADAR DATA \
+PROCESSED --> non-fatal"
+      postmsg  "$msg"
+#
+# cleanup the bufrout total file in $DATA after tranjb failed with an error
+#
+
+      /bin/rm -rf $DATA/vadbufrout_total.stations
+      #find $DATA -name '*uncom*' -exec /bin/rm -rf {} \; 
+
+   fi
+   export log=$DCOM_OUT/tranjb_nexrad_pbl.out
+   #$USHsatingest/bufr_tranjb.sh $DCOM_OUT ./pblbufrout_total.stations
+   $TRANush $DCOM_OUT ./pblbufrout_total.stations
+   err=$?
+   if [ $err -eq 0 ]
+   then
+      msg="TRANJB completed normally----levelII pbl"
+#      postmsg "$jlogfile" "$msg"
+#
+# cleanup the bufrout total file in $DATA after running tranjb
+#
+
+#  /bin/rm -rf $DATA/bufrout_total.stations
+   #find $DATA -name '*uncom*' -exec /bin/rm -rf {} \; 
+
+   else
+
+      msg="**ERROR: TRANJB FAILED with r.c. $err - NO LEVEL 2 pbl wind RADAR DATA \
+PROCESSED --> non-fatal"
+#      postmsg "$jlogfile" "$msg"
+#
+# cleanup the bufrout total file in $DATA after tranjb failed with an error
+#
+
+      /bin/rm -rf $DATA/pblbufrout_total.stations
+      #find $DATA -name '*uncom*' -exec /bin/rm -rf {} \; 
+
+   fi
+
+
+fi
+
+echo `date`
+cat $pgmout
+
+#############################################################
+
+msg="NEXRAD LEVEL 2 RADIAL WIND AND REFLECTIVITY PROCESSING HAS COMPLETED \
+NORMALLY!"
+postmsg "$msg"
+
+KEEPDATA=${KEEPDATA:-NO}
+if [ $KEEPDATA != "YES" ] ; then
+     rm -rf $DATA
+fi
+
+exit

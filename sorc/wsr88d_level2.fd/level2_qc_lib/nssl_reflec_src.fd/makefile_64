@@ -1,0 +1,33 @@
+
+
+OBJS = mosaic_adapt_pars.o   PHYCST.o BRIGHTBAND.o  CONFIG_PARS.o   RADAR2.o \
+        reflectivity.o  maplib3d.o  compare_tilt_lut.o  dataSelect.o\
+        get_radattr_realtime.o     ini_grd.o \
+        read_RUCWindField.o    readTiltData.o    readtrn_func.o\
+        set_grd.o     src.o   get_config.o  get_brightband.o
+
+
+
+F90  = xlf90
+RM = rm -f
+FLAG = -c -qnolm -q64 -qdbg -qfree=f90 -qsuffix=f=f90 -O2 \
+          -qnullterm -qnosave -qmaxmem=-1 -qspill=32000 
+LIB  = ../lib_SRC.a
+.SUFFIXES : .f90 .f
+
+
+all:: $(LIB)
+
+$(LIB): $(OBJS)
+	ar -X64 -rv $(LIB) $(OBJS)
+
+
+.f90.o:
+	$(F90) $(FLAG) $<
+.f.o:
+	$(F90) $(FLAG) $<
+
+
+clean::
+	$(RM) $(LIB) $(OBJS) *.mod 
+

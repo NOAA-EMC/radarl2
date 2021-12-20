@@ -1,0 +1,62 @@
+#BSUB -J %E%radar_level2
+#BSUB -o /com/output/%ENVIR%/today/radar_level2.o%J
+#BSUB -L /bin/sh
+#BSUB -cwd /tmpnwprd
+#BSUB -q %QUEUE%
+#BSUB -P %PROJ%-%PROJENVIR%
+#BSUB -x
+#BSUB -n 30
+#BSUB -R span[ptile=6]
+#BSUB -network "type=sn_all:mode=US"
+#BSUB -R affinity[core:distribute=balance]
+#BSUB -W 01:00
+#BSUB -a poe
+
+%include <head.h>
+%include <envir-p1.h>
+
+export MP_PULSE=0
+export MP_DEBUG_NOTIMEOUT=yes
+
+# EXPORT list here
+export envir=%ENVIR%
+#export job=radar_level2
+##export job=`date -u +radar_level2_%%H%%M`
+export cyc=`date -u +%%H`
+export TIME_FLAG=YES
+
+# CALL executable job script here
+
+# versions file for radar_level2 sets $code_ver
+VERSION_FILE=/nw${envir}/versions/wsr88d_level2.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  ecflow_client --msg="***JOB ${SMSNAME} ERROR: Version File $VERSION_FILE does not exist ***"
+  ecflow_client --abort
+  exit
+fi
+
+/nw${envir}/decoders/wsr88d_level2.${code_ver}/jobs/JRADAR_LEVEL2
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${SMSNAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+%include <tail.h>
+%manual
+######################################################################
+# Purpose: To process the level 2 radar data
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end
+

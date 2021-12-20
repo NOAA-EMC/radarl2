@@ -1,0 +1,62 @@
+#BSUB -J %E%radar_reflectivity_mosaic
+#BSUB -o /com/output/%ENVIR%/today/radar_reflectivity_mosaic.o%J
+#BSUB -e /com/output/%ENVIR%/today/radar_reflectivity_mosaic.o%J
+#BSUB -L /bin/sh
+#BSUB -cwd /tmpnwprd
+#BSUB -q %QUEUE%
+#BSUB -n 8
+#BSUB -R span[ptile=8]
+#BSUB -P %PROJ%-%PROJENVIR%
+#BSUB -a poe
+#BSUB -x
+#BSUB -W 00:10
+#BSUB -v 1048576
+
+%include <head.h>
+%include <envir-p1.h>
+
+export TIME_FLAG=YES
+export MP_TASK_AFFINITY=core
+export MP_EUIDEVICE=sn_all
+export MP_EUILIB=us
+
+# EXPORT list here
+export envir=%ENVIR%
+#export job=`date -u +radar_reflectivity_mosaic_%%H%%M`
+export cyc=`date -u +%%H`
+
+# CALL executable job script here
+
+VERSION_FILE=/nw${envir}/versions/radar_reflectivity_mosaic.ver
+if [ -f $VERSION_FILE ]; then
+  . $VERSION_FILE
+else
+  ecflow_client --msg="***JOB ${ECFNAME} ERROR: Version File $VERSION_FILE
+does not exist ***"
+  ecflow_client --abort
+  exit
+fi
+
+/nw$envir/radar_reflectivity_mosaic.${radar_reflectivity_mosaic_ver}/jobs/JRADAR_REFLECTIVITY_MOSAIC
+
+if [ $? -ne 0 ]; then
+  ecflow_client --msg="***JOB ${SMSNAME} ERROR RUNNING J-SCRIPT ***"
+  ecflow_client --abort
+  exit
+fi
+
+%include <tail.h>
+%manual
+######################################################################
+# Purpose: To process the radar mosaic data
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end
+

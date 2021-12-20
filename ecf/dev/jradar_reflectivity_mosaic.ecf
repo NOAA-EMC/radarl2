@@ -1,0 +1,45 @@
+#!/bin/bash
+  
+#PBS -N jradar_reflectivity_mosaic
+#PBS -j oe 
+#PBS -A NAM-DEV
+#PBS -l select=1:ncpus=8
+#PBS -q dev
+#PBS -l walltime=00:10:00
+
+set -x
+
+source $HOME/versions/run.ver
+export HOME=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radar_level2.$radar_level2_ver
+
+module purge
+module load envvar/$envvar_ver
+module load PrgEnv-intel/$PrgEnv_intel_ver
+module load intel/$intel_ver
+module load craype/$craype_ver
+module load cray-mpich/$cray_mpich_ver
+module load cray-pals/$cray_pals_ver
+module load prod_util/$prod_util_ver
+module load cfp/$cfp_ver
+module list
+
+echo $USER
+export DATAROOT=/lfs/h2/emc/stmp/Shun.Liu
+mkdir -p $DATAROOT
+export HOMEradar_level2=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radar_level2.$radar_level2_ver
+export COMROOT=/lfs/h2/emc/ptmp/Shun.Liu/com
+export hisdir=/lfs/h2/emc/ptmp/Shun.Liu/dcom
+export envir=para
+
+#cyc=`$NDATE | cut -c9-10`
+export cyc=06
+export PDY=20210827
+mkdir -p /lfs/h2/emc/ptmp/Shun.Liu/cron
+
+export job=radar_reflecitivty_mosaic
+echo $job
+
+export KEEPDATA=YES
+
+$HOME/jobs/JRADAR_REFLECTIVITY_MOSAIC
+

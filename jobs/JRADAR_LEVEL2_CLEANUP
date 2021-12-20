@@ -1,0 +1,98 @@
+#!/bin/sh
+
+set -xa
+# ##############################
+# SET SHELL PROCESSING VARIABLES
+# ##############################
+export PS4='MAIN:$SECONDS + '
+
+####################################
+# obtain unique process id (pid) and make temp directory
+####################################
+export pid=$$
+export DATA=${DATA:-${DATAROOT:?}/${jobid:?}}
+mkdir -p $DATA
+cd $DATA
+
+date
+export time=`date -u "+%Y%m%d%H%M"`
+echo $time
+echo `date`
+export cycle=t${cyc}z
+
+####################################
+# Specify NET and RUN Name and model
+####################################
+export NET=radarl2
+#export NET=radar
+#export model=radar
+
+####################################
+# File To Log Msgs
+####################################
+export jlogfile=$DATA/jlogfile
+
+####################################
+# Determine Job Output Name on System
+####################################
+export outid="LL$job"
+export jobid="${outid}.o${pid}"
+export pgmout="OUTPUT.${pid}"
+
+####################################
+# SENDDBN  - Send files to OSO
+####################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+####################################
+# Specify Execution Areas
+####################################
+# JY export SRCtank=${SRCtank:-$COMROOT/$NET/${envir}/SRCtank}
+export COMOUT_SRCtank=${COMOUT_SRCtank:-$(compath.py -o ${NET}/${radarl2_ver}/SRCtank)}
+
+##############################
+# Set up the UTILITIES
+##############################
+
+##############################
+# Run setup to initialize working directory and utility scripts
+##############################
+
+##############################
+# Run setpdy and initialize PDY variables
+##############################
+setpdy.sh
+. ./PDY
+
+env
+
+#############################################################
+# execute the scripts
+ 
+msg="LEVEL 2 RADAR CLEANUP PROCESSING HAS BEGUN on \
+`hostname`"
+postmsg "$jlogfile" "$msg"
+
+cd $COMOUT_SRCtank
+du -s
+# JY - change keep time on 2019/01/07 
+# for filename in $(find . -name "*.src" -mmin +90)
+for filename in $(find . -name "*.src" -mmin +720)
+ do
+  echo "Remove file: $filename"
+  ls -lrt $filename
+  rm -rf $filename
+ done
+du -s
+#############################################################
+
+msg="LEVEL 2 RADAR CLEANUP PROCESSING HAS COMPLETED \
+NORMALLY!"
+postmsg "$jlogfile" "$msg"
+
+if [ "${KEEPDATA}"!=YES ]; then
+  rm -fr $DATA
+fi
+
+

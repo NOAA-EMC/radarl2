@@ -1,0 +1,38 @@
+#PBS -N radarl2_cleanup_%TIME%
+#PBS -j oe
+#PBS -S /bin/bash
+#PBS -l walltime=01:00:00
+#PBS -A %PROJ%-%PROJENVIR%
+#PBS -q %QUEUE%
+#PBS -l select=1:ncpus=1:mem=2000MB
+
+model=radarl2
+%include <head.h>
+%include <envir-p1.h>
+
+# EXPORT list here
+export envir=%ENVIR%
+export cyc=`date -u +%%H`
+
+
+module list
+
+# CALL executable job script here
+
+$HOMEradarl2/jobs/JRADAR_LEVEL2_CLEANUP
+
+%include <tail.h>
+%manual
+######################################################################
+# Purpose: To process the level 2 radar data
+######################################################################
+
+######################################################################
+# Job specific troubleshooting instructions:
+#  see generic troubleshoot manual page
+#
+######################################################################
+
+# include manual page below
+%end
+
