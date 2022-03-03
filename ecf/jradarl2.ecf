@@ -25,13 +25,9 @@ module list
 
 # EXPORT list here
 export envir=%ENVIR%
-#export job=radar_level2
-##export job=`date -u +radar_level2_%%H%%M`
 export cyc=`date -u +%%H`
-#export TIME_FLAG=YES
 
 # CALL executable job script here
-
 $HOMEradarl2/jobs/JRADAR_LEVEL2
 
 %include <tail.h>
