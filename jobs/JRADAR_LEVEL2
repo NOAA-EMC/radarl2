@@ -326,18 +326,8 @@ else
    export SUBDATE_CHECK=NO
 
    export log=$DCOM_OUT/tranjb_nexrad_2p0.out
-#  $USHsatingest/bufr_tranjb.sh $DCOM_OUT ./bufrout_total.stations
-   nbufr=0
-   tbufr=8 #total bufr files in tranjb job
-   gbufr=`expr $NUMPROC / $tbufr + 1`  #how many file in each bufr group
-   while [ $nbufr -lt $NUMPROC ]
-   do
-     nbufr=`expr $nbufr + 1`
-     thisbufr=`expr \( $nbufr - 1 \) / $gbufr + 1`
-     cat bufrout.task$nbufr >> bufrout.g$thisbufr
-   done
 
-   for i in `seq 1 $tbufr`
+   for i in `seq 1 $NUMPROC`
    do
      #$USHsatingest/bufr_tranjb.sh $DCOM_OUT ./bufrout.g$i
      $TRANush $DCOM_OUT ./bufrout.task$i
