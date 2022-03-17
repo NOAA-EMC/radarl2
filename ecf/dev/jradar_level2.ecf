@@ -9,7 +9,7 @@
 
 set -x
 
-export HOME=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radarl2.v1.2.1
+export HOME=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radarl2.v1.2.2
 source $HOME/versions/run.ver
 export HOME=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radarl2.v$radar_level2_ver
 

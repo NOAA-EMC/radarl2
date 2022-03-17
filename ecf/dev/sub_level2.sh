@@ -12,6 +12,6 @@
 
 source ~/.bashrc
 
-cd /lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radarl2.v1.2.1/ecf/dev
+cd /lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radarl2.v1.2.2/ecf/dev
 
 qsub jradar_level2.ecf 
