@@ -9,9 +9,9 @@
 
 set -x
 
-export HOME=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radarl2.v1.2.2
-source $HOME/versions/run.ver
+radar_level2_ver=1.2.2
 export HOME=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radarl2.v$radar_level2_ver
+source $HOME/versions/run.ver
 
 module purge
 module load envvar/$envvar_ver

@@ -52,7 +52,6 @@ export pgmout="OUTPUT.${pid}"
 ####################################
 # Specify Execution Areas
 ####################################
-#export HOMEradarl2=${HOMEradarl2:-${PACKAGEROOT}/radarl2.${radarl2_ver}}
 export EXECradar=$HOMEradarl2/exec
 export FIXradar=$HOMEradarl2/fix
 export SCRIPTradar=$HOMEradarl2/scripts
