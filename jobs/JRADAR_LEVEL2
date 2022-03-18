@@ -104,10 +104,6 @@ postmsg "$msg"
 
 set -x
 #export NUMPROC=$LSB_DJOB_NUMPROC
-# JY check here
-echo "DEBUG: NCPUS=$NCPUS"
-
-# JY export NUMPROC=32
 export NUMPROC=$NCPUS
 
 cp $FIXbufr/bufrtab.006 ./.

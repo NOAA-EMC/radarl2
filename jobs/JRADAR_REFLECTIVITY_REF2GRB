@@ -36,14 +36,12 @@ export pgmout="OUTPUT.${pid}"
 ####################################
 # Specify Execution Areas
 ####################################
-#export HOMEradarl2=${HOMEradarl2:-${NWROOT}/radar_level2.${radar_ver}}
 export EXECradar=$HOMEradarl2/exec
 export PARMradar=$HOMEradarl2/parm
 export SCRIPTSradar=$HOMEradarl2/scripts
 
 
 mydate=`${NDATE}`
-#mydate=${PDY}${cyc}
 myyear=`echo $mydate | cut -c1-4`
 mymon=`echo $mydate | cut -c5-6`
 myday=`echo $mydate | cut -c7-8`
@@ -77,10 +75,8 @@ $SCRIPTSradar/exradar_reflectivity_ref2grb.sh
 cat $pgmout
 
 mydate=`$NDATE -48`
-#mydate=`$NDATE -48 ${PDY}${cyc}`
 
 COMINm1=${COMINm1:-${COMROOT}/${NET}/${RUN}.$mydate}
-#COMINm1=${COMINm1:-$(compath.py ${envir}/${NET}/${radarl2_ver}/${RUN}.$mydate)}
 
 rm -rf ${COMINm1}
 

@@ -55,7 +55,6 @@ export hisdir=${hisdir:-${DCOMROOT}/../../${envir}/dcom/nexrad_level2}
 # set mosaic dump history file 
 ####################################
 currenttime=`$NDATE ``date +%M`
-#currenttime=${PDY}${cyc}`date +%M`
 
 echo 'current time:' $currenttime
 currenthour=`echo $currenttime | cut -c9-10`
