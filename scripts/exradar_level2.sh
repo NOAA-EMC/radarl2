@@ -175,10 +175,10 @@ for filename in `cat new_files_${stng}`; do ##### new_files
 #==================================
 #   test wcoss2
 #==================================
-   mydate=202108270600
-   hourmc=${mydate}
-   mydate=202108270400
-   hourm2=${mydate}
+#  mydate=202108270600
+#  hourmc=${mydate}
+#  mydate=202108270400
+#  hourm2=${mydate}
 #==================================
 #   end test
 #==================================

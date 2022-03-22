@@ -2,7 +2,7 @@
 #PBS -j oe
 #PBS -S /bin/bash
 #PBS -q %QUEUE%
-#PBS -l select=1:ncpus=8:mem=10000MB 
+#PBS -l select=1:ncpus=8:mem=10GB 
 #PBS -A %PROJ%-%PROJENVIR%
 #PBS -l walltime=00:10:00
 #PBS -l debug=true
@@ -23,7 +23,6 @@ module list
 
 # EXPORT list here
 export envir=%ENVIR%
-#export job=`date -u +radar_reflectivity_mosaic_%%H%%M`
 export cyc=`date -u +%%H`
 
 # CALL executable job script here

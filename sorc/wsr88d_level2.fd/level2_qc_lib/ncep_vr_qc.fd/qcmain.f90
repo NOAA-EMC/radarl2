@@ -867,7 +867,7 @@ If(1==1)then
        if(qccontr(i)%vcp==31 .or. qccontr(i)%vcp==32 .or. &
       qccontr(i)%vcp==35 .or. qccontr(i)%vcp==215 .or. &
          qccontr(i)%vcp==231 .or. qccontr(i)%vcp==232) then
-         if( qccontr(i)%avg_sd>0.7.and.qccontr(i)%sn_minus_9pt>3.0) then
+         if( qccontr(i)%avg_sd>0.7.and.qccontr(i)%sn_minus_9pt>38.5) then
          qccontr(i)%mark='reject' 
          qccontr(i)%value=4 
          end if

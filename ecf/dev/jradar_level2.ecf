@@ -1,6 +1,6 @@
 #!/bin/bash
   
-#PBS -N jradar_level2
+#PBS -N level2
 #PBS -j oe 
 #PBS -A NAM-DEV
 #PBS -l place=vscatter,select=1:ncpus=32
@@ -9,8 +9,9 @@
 
 set -x
 
+radar_level2_ver=1.2.2
+export HOME=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radarl2.v$radar_level2_ver
 source $HOME/versions/run.ver
-export HOME=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radar_level2.$radar_level2_ver
 
 module purge
 module load envvar/$envvar_ver
@@ -28,30 +29,53 @@ module list
 echo $USER
 export envir=para
 export DATAROOT=/lfs/h2/emc/stmp/Shun.Liu
-export NWROOTp3=/lfs/h1/ops/canned/packages/dell1
-export NWROOT=/lfs/h1/ops/canned/packages/dell1
-export DCOMROOT=/lfs/h1/ops/canned/dcom
-export COMIN=${DCOMROOT}/ldmdata/obs/upperair/nexrad_level2
+#export NWROOTp3=/lfs/h1/ops/canned/packages/dell1
+#export NWROOT=/lfs/h1/ops/canned/packages/dell1
+#export DCOMROOT=/lfs/h1/ops/canned/dcom
+#export COMIN=${DCOMROOT}/ldmdata/obs/upperair/nexrad_level2
+export COMIN=/lfs/h1/ops/prod/dcom/ldmdata/obs/upperair/nexrad_level2
   
 mkdir -p $DATAROOT
-export HOMEradar_level2=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radar_level2.$radar_level2_ver
-#export HOMEbufr=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radar_level2.$radar_level2_ver
+export HOMEradarl2=/lfs/h2/emc/da/noscrub/Shun.Liu/nwprod/radarl2.v$radar_level2_ver
+export HOMEbufr=/lfs/h1/ops/prod/decoders/decod_shared
 export COMROOT=/lfs/h2/emc/ptmp/Shun.Liu/com
 mkdir -p $COMROOT
++ export DCOMROOT=/lfs/h1/ops/prod/dcom
 #export DCOM_IN=/lfs/h2/emc/ptmp/Shun.Liu/dcom/${envir}/nexrad_level2
 export DCOM_IN=/lfs/h2/emc/ptmp/Shun.Liu/dcom/nexrad_level2
 export DCOM_OUT=/lfs/h2/emc/ptmp/Shun.Liu/dcom
+export COMOUT_SRCtank=/lfs/h2/emc/ptmp/Shun.Liu/com/radarl2/v1.2/SRCtank
+
+
+#+ export NWROOTp3=/lfs/h1/ops/canned/packages/dell1
+#+ export NWROOT=/lfs/h1/ops/canned/packages/dell1
+#+ export DCOMROOT=/lfs/h1/ops/prod/dcom
+#+ mkdir -p /lfs/h2/emc/stmp/Shun.Liu
+#+ export HOMEbufr=/lfs/h1/ops/prod/decoders/decod_shared
+#+ export COMROOT=/lfs/h2/emc/ptmp/Shun.Liu/com
+#+ mkdir -p /lfs/h2/emc/ptmp/Shun.Liu/com
+#+ export DCOM_IN=/lfs/h2/emc/ptmp/Shun.Liu/dcom/nexrad_level2
+#+ export DCOM_OUT=/lfs/h2/emc/ptmp/Shun.Liu/dcom
+
 
 mkdir -p $DCOM_OUT
-#cyc=`$NDATE | cut -c9-10`
+cyc=`$NDATE | cut -c9-10`
 export cyc=00
-export PDY=20210827
+#export PDY=20210827
 mkdir -p /lfs/h2/emc/ptmp/Shun.Liu/cron
 
 export job=level2
 echo $job
 
+#export decprod=/lfs/h2/emc/obsproc/noscrub/decprod
+#export FIXbufr=${decprod}/decod_shared/fix
+#export cword=no
+
+#export obsproc_shared_bufr_cword_ver=v1.0.0
+#export MESSAGE_LENGTH=200000
+#export SCREEN=off
+
+
 export KEEPDATA=YES
 
 $HOME/jobs/JRADAR_LEVEL2
-

@@ -6,8 +6,7 @@
 ##___________________________________________________
 #source /apps/prod/lmodules/startLmod.ksh
 
-module purge
-module load envvar/$envvar_ver
+module reset
 module load PrgEnv-intel/$PrgEnv_intel_ver
 
 module load intel/$intel_ver

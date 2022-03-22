@@ -39,11 +39,6 @@ export NET=radarl2   # 15 min now
 #export radar=hourly   # 15 min now
 export RUN=radar
 
-####################################
-# Determine Job Output Name on System
-####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
 export pgmout="OUTPUT.${pid}"
 
 ####################################
@@ -59,8 +54,7 @@ export hisdir=${hisdir:-${DCOMROOT}/../../${envir}/dcom/nexrad_level2}
 ####################################
 # set mosaic dump history file 
 ####################################
-# JY currenttime=`$NDATE ``date +%M`
-currenttime=${PDY}${cyc}`date +%M`
+currenttime=`$NDATE ``date +%M`
 
 echo 'current time:' $currenttime
 currenthour=`echo $currenttime | cut -c9-10`
@@ -142,16 +136,6 @@ fi
 # export COMIN_SRCtank=${COMIN_SRCtank:-${COMROOT}/${NET}/SRCtank}
 export COMOUT_REFprod=${COMOUT_REFprod:-$(compath.py -o ${NET}/${radarl2_ver}/${RUN}.$mydate)}
 export COMIN_SRCtank=${COMIN_SRCtank:-$(compath.py ${envir}/${NET}/${radarl2_ver}/SRCtank)}
-
-##############################
-# Set up the UTILITIES
-##############################
-#export utilscript=/nwprod/util/ush
-
-##############################
-# Run setup to initialize working directory and utility scripts
-##############################
-#sh $utilscript/setup.sh
 
 ##############################
 # Run setpdy and initialize PDY variables

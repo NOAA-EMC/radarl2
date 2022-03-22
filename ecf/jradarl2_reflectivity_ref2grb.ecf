@@ -2,7 +2,7 @@
 #PBS -j oe
 #PBS -S /bin/bash
 #PBS -q %QUEUE%
-#PBS -l select=1:ncpus=8:mem=10000MB 
+#PBS -l select=1:ncpus=8:mem=10GB 
 #PBS -A %PROJ%-%PROJENVIR%
 #PBS -l walltime=00:10:00
 #PBS -l debug=true
@@ -12,9 +12,7 @@ model=radarl2
 %include <envir-p1.h>
 
 # EXPORT list here
-#export TIME_FLAG=YES
 export envir=%ENVIR%
-#export job=`date -u +radar_reflectivity_ref2grb_%%H%%M`
 export cyc=`date -u +%%H`
 
 module load PrgEnv-intel/$PrgEnv_intel_ver

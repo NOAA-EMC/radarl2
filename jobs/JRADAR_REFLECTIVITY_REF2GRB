@@ -14,13 +14,6 @@ thisver=$radar_ver
 ###########################################################
 export pid=$$
 export job=radar_reflectivity_ref2grb
-#if [ $envir = prod ]
-#then
-#    DATAROOT=/tmpnwprd1
-#else
-#    DATAROOT=/tmpnwprd2
-#fi
-#export DATA=${DATA:-$DATAROOT/${job}.${pid}}
 export DATA=$DATAROOT/${job}.${pid}
 mkdir -p $DATA
 cd $DATA 
@@ -36,36 +29,19 @@ export RUN=radar
 export cycle=t${cyc}z
 export SENDCOM=${SENDCOM:-YES}
 
-####################################
-# Set up GEMPAK/NTRANS environment
-####################################
-#. /nwprod/gempak/.gempak
 export FIXgempak=$GEMTBL
 
-
-####################################
-# Determine Job Output Name on System
-####################################
-export outid="LL$job"
-export jobid="${outid}.o${pid}"
 export pgmout="OUTPUT.${pid}"
 
 ####################################
 # Specify Execution Areas
 ####################################
-export HOMEradarl2=${HOMEradarl2:-${NWROOT}/radar_level2.${radar_ver}}
 export EXECradar=$HOMEradarl2/exec
 export PARMradar=$HOMEradarl2/parm
 export SCRIPTSradar=$HOMEradarl2/scripts
 
-##############################
-# Set up the UTILITIES
-##############################
-#export utilscript=/nwprod/util/ush
-#export utilexec=/nwprod/util/exec
 
-# JY mydate=`${NDATE}`
-mydate=${PDY}${cyc}
+mydate=`${NDATE}`
 myyear=`echo $mydate | cut -c1-4`
 mymon=`echo $mydate | cut -c5-6`
 myday=`echo $mydate | cut -c7-8`
@@ -81,11 +57,6 @@ export COMIN=${COMIN:-$(compath.py ${envir}/${NET}/${radarl2_ver}/${RUN}.$mydate
 export SRCtank=${COMIN_SRCtank:-$(compath.py ${envir}/${NET}/${radarl2_ver}/SRCtank)}
 
 ##############################
-# Run setup to initialize working directory and utility scripts
-##############################
-#sh $utilscript/setup.sh
-
-##############################
 # Run setpdy and initialize PDY variables
 ##############################
 setpdy.sh
@@ -94,7 +65,6 @@ setpdy.sh
 ##############################
 # Set COMOUT
 ##############################
-# JY export COMOUT=${COMOUT:-${COMROOT}/${NET}/${RUN}.$PDY}
 export COMOUT=${COMOUT:-$(compath.py -o ${NET}/${radarl2_ver}/${RUN}.$PDY)}
 mkdir -p $COMOUT
 
@@ -104,11 +74,9 @@ mkdir -p $COMOUT
 $SCRIPTSradar/exradar_reflectivity_ref2grb.sh
 cat $pgmout
 
-# JY mydate=`$NDATE -48`
-mydate=`$NDATE -48 ${PDY}${cyc}`
+mydate=`$NDATE -48`
 
-# JY COMINm1=${COMINm1:-${COMROOT}/${NET}/${RUN}.$mydate}
-COMINm1=${COMINm1:-$(compath.py ${envir}/${NET}/${radarl2_ver}/${RUN}.$mydate)}
+COMINm1=${COMINm1:-${COMROOT}/${NET}/${RUN}.$mydate}
 
 rm -rf ${COMINm1}
 

@@ -21,4 +21,6 @@ make
 cd $pwd/wsr88d_level2.fd/; 
 make
 
-cp wsr88d_level2 ../../exec 
+mkdir -p -m 775 ../../exec
+
+cp -p wsr88d_level2 ../../exec/ 
