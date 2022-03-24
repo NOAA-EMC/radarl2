@@ -1,4 +1,27 @@
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+radarl2.v1.2.2---wsr88d_level2 release 1.2.2 --> released Mar 24, 2022
+
+Instructions:
+---------------------
+step 1, check out radarl2.v1.2.2
+method 1:
+cd /lfs/h1/ops/prod/packages
+git clone https://github.com/NOAA-EMC/radarl2 radarl2.v1.2.2
+method 2:
+cd /lfs/h1/ops/prod/packages
+cp /lfs/h2/emc/da/noscrub/Shun.Liu/deliver_to_nco/20220324/radarl2.v1.2.2 .
+
+step2, cp fix files
+cp -r /lfs/h1/ops/prod/packages/radarl2.v1.2.1/fix/SRC_LUT to /lfs/h1/ops/prod/packages/radarl2.v1.2.2/fix
+
+step3, compile packages
+cd  /lfs/h1/ops/prod/packages/radarl2.v1.2.2
+build_wsr88d.sh
+build_mosaic.sh
+build_ref2grb.sh
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 radar_level2.v1.1.1---wsr88d_level2 release 1.1.1 --> released Oct 07, 2021
 
  code changes:
